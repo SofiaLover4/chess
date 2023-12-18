@@ -7,3 +7,5 @@ source "https://rubygems.org"
 gem "rubocop", "~> 1.59"
 
 gem "ruby-lsp", "~> 0.13.1"
+
+gem "colorize", "~> 1.1"
