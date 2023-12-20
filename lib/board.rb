@@ -7,11 +7,12 @@ class Square
   attr_accessor :peice, :coordinates, :distance, :previous, :content
 
   def initialize(format, coordinates)
+    # The board will be read using [x,y] internally
     @format = format # Format is supposed to be a function
     @coordinates = coordinates
     @peice = nil
 
-    @content = format.call('   ')
+    @content = format.call(" #{@coordinates} ")
   end
 end
 
@@ -28,8 +29,13 @@ class ChessBoard
     while i < 8
       j = 0
       while j < 8
-        square = (i + j).even? ? '   '.on_white : '   '.on_black
-        board[i].push(square)
+        format = if (i + j).odd? # Color of the squares
+                   ->(content) { content.on_black }
+                 else
+                   ->(content) { content.on_white }
+                 end
+
+        board[i].push(Square.new(format, [i, j]))
         j += 1
       end
       i += 1
@@ -44,8 +50,8 @@ class ChessBoard
 
   def show_board
     @board.each do |column|
-      column.each do |tile|
-        print tile
+      column.each do |square|
+        print square.content
       end
       print "\n"
     end
