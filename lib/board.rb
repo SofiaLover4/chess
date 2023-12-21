@@ -13,6 +13,10 @@ class Square
 
     @content = format.call('   ')
   end
+
+  def inspect
+    "Square: #{@coordinates} \nPiece: #{@piece} \nViewable Content: #{@content} "
+  end
 end
 
 # A class for the board the user will see
