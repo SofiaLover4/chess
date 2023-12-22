@@ -60,4 +60,11 @@ class ChessBoard
       print "\n"
     end
   end
+
+  def [](column, row)
+    raise TypeError, 'Type Error: Integers' unless column.is_a?(Integer) && row.is_a?(Integer)
+    raise IndexError, 'Index out of bounds' if column > 7 || row > 7
+
+    @board[column][row]
+  end
 end
