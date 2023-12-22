@@ -12,7 +12,7 @@ class Square
     @coordinates = coordinates
     @peice = nil
 
-    @content = format.call(" #{@coordinates} ")
+    @content = format.call('   ')
   end
 
   def inspect
