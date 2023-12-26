@@ -2,15 +2,15 @@
 
 require 'colorize'
 
-# Nodes where peices will be stored within the game
+# Nodes where pieces will be stored within the game
 class Square
-  attr_accessor :peice, :coordinates, :distance, :previous, :content
+  attr_accessor :piece, :coordinates, :distance, :previous, :content
 
   def initialize(format, coordinates)
     # The board will be read using [x,y] internally
     @format = format # Format is supposed to be a function
     @coordinates = coordinates
-    @peice = nil
+    @piece = nil
 
     @content = format.call('   ')
   end
