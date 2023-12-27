@@ -41,7 +41,7 @@ class ChessBoard
                    ->(content) { content.on_white }
                  end
 
-        board[i].push(Square.new(format, [7 - j, 7 - i]))
+        board[i].push(Square.new(format, [j, 7 - i]))
         j += 1
       end
       i += 1
@@ -54,6 +54,10 @@ class ChessBoard
     @board = create_board
   end
 
+  def add_piece(coordinates, piece, team)
+    self[coordinates].piece = piece.new(team, coordinates)
+  end
+
   def show_board
     @board.each do |column|
       column.each do |square|
@@ -64,6 +68,6 @@ class ChessBoard
   end
 
   def [](coordinates)
-    @board[7 - coordinates[1]][7 - coordinates[0]]
+    @board[7 - coordinates[1]][coordinates[0]]
   end
 end
