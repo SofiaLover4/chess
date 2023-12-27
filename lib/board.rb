@@ -4,19 +4,21 @@ require 'colorize'
 
 # Nodes where pieces will be stored within the game
 class Square
-  attr_accessor :piece, :coordinates, :distance, :previous, :content
+  attr_accessor :piece, :coordinates, :distance, :previous, :format
 
   def initialize(format, coordinates)
-    # The board will be read using [x,y] internally
+    # The board will be read using [x, y]
     @format = format # Format is supposed to be a function
     @coordinates = coordinates
     @piece = nil
+  end
 
-    @content = format.call('   ')
+  def content
+    format.call(@piece.nil? ? '   ' : " #{@piece.symbol} ")
   end
 
   def inspect
-    "Square: #{@coordinates} \nPiece: #{@piece} \nViewable Content: #{@content} "
+    "Square: #{@coordinates} \nPiece: #{@piece} \nViewable Content: #{content} "
   end
 end
 
@@ -39,7 +41,7 @@ class ChessBoard
                    ->(content) { content.on_white }
                  end
 
-        board[i].push(Square.new(format, [i, j]))
+        board[i].push(Square.new(format, [7 - j, 7 - i]))
         j += 1
       end
       i += 1
@@ -62,6 +64,6 @@ class ChessBoard
   end
 
   def [](coordinates)
-    @board[coordinates[0]][coordinates[1]]
+    @board[7 - coordinates[1]][7 - coordinates[0]]
   end
 end
