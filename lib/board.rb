@@ -55,7 +55,7 @@ class ChessBoard
   end
 
   def add_piece(coordinates, piece, team)
-    self[coordinates].piece = piece.new(team, coordinates)
+    self[coordinates].piece = piece.new(team, self, coordinates)
   end
 
   def show_board
