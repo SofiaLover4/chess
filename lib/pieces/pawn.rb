@@ -14,7 +14,8 @@ class Pawn < Piece
               elsif team == 'black'
                 '♟︎'.grey
               end
-    @possible_moves = update_possible_moves
+    @possible_moves = nil
+    update_possible_moves
   end
 
   def update_possible_moves
