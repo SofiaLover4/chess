@@ -16,4 +16,12 @@ class Piece
 
     x < 0 || x > 7 || y < 0 || y > 7
   end
+
+  def possible_moves(&block)
+    if block_given?
+      @possible_moves.each { |move| block.call(move) } # Will be used to show possible moves on the board
+    else
+      @possible_moves
+    end
+  end
 end

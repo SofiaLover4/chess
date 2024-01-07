@@ -27,14 +27,6 @@ class Pawn < Piece
     end
   end
 
-  def possible_moves(&block)
-    if block_given?
-      @possible_moves.each { |move| block.call(move) } # Will be used to show possible moves on the board
-    else
-      @possible_moves
-    end
-  end
-
   def possible_capture?(coordinates)
     !(out_of_bounds?(coordinates) || @board[coordinates].piece.nil? || @board[coordinates].piece.team == @team)
   end
