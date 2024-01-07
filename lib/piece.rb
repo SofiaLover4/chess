@@ -4,8 +4,9 @@
 class Piece
   attr_accessor :team, :symbol, :coordinates, :possible_moves
 
-  def initialize(team, coordinates)
+  def initialize(team, board, coordinates)
     @team = team
+    @board = board
     @coordinates = coordinates
   end
 

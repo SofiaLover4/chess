@@ -8,13 +8,12 @@ class Pawn < Piece
   attr_accessor :symbol, :board
 
   def initialize(team, board, coordinates)
-    super(team, coordinates)
+    super(team, board, coordinates)
     @symbol = if team == 'white'
                 '♙'
               elsif team == 'black'
                 '♟︎'
               end
-    @board = board
     @possible_moves = update_possible_moves
   end
 
