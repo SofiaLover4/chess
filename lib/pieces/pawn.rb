@@ -10,9 +10,9 @@ class Pawn < Piece
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
     @symbol = if team == 'white'
-                '♙'
-              elsif team == 'black'
                 '♟︎'
+              elsif team == 'black'
+                '♟︎'.grey
               end
     @possible_moves = update_possible_moves
   end
