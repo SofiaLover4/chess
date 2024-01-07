@@ -2,7 +2,7 @@
 
 # A foundation for all the chess pieces
 class Piece
-  attr_accessor :team, :symbol, :coordinates, :possible_moves
+  attr_accessor :team, :board, :coordinates
 
   def initialize(team, board, coordinates)
     @team = team

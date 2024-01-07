@@ -5,7 +5,7 @@ require_relative '../board'
 
 # Pawn class for Chessboard
 class Pawn < Piece
-  attr_accessor :symbol, :board
+  attr_accessor :symbol
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
