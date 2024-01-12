@@ -15,7 +15,6 @@ class Rook < Piece
                 '♜'.grey
               end
     @moved = false
-    @possible_moves = nil
     update_possible_moves
   end
 

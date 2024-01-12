@@ -8,6 +8,7 @@ class Piece
     @team = team
     @board = board
     @coordinates = coordinates
+    @possible_moves = nil
   end
 
   def out_of_bounds?(coordinates)
