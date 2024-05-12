@@ -6,6 +6,7 @@ require_relative '../board'
 # Pawn class for Chessboard
 class Pawn < Piece
   attr_accessor :symbol
+  attr_writer :moved
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
@@ -14,7 +15,13 @@ class Pawn < Piece
               elsif team == 'black'
                 '♟︎'.grey
               end
+    @moved = false
     update_possible_moves
+  end
+
+  # Because a Pawn can only move twice if they haven't moved yet
+  def moved?
+    @moved
   end
 
   def update_possible_moves
@@ -45,8 +52,8 @@ class Pawn < Piece
     moves = Set.new
     x = @coordinates[0]
     y = @coordinates[1]
-
-    2.times do
+    forward_spaces = moved? ? 1 : 2 # If the pawn has moved it can only move one space ahead else
+    forward_spaces.times do
       y += 1
       break if out_of_bounds?([x, y]) || !@board[[x, y]].piece.nil?
 
@@ -71,8 +78,8 @@ class Pawn < Piece
     moves = Set.new
     x = @coordinates[0]
     y = @coordinates[1]
-
-    2.times do
+    forward_spaces = moved? ? 1 : 2
+    forward_spaces.times do
       y -= 1
       break if out_of_bounds?([x, y]) || !@board[[x, y]].piece.nil?
 

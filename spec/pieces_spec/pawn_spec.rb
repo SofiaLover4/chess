@@ -46,12 +46,18 @@ describe Pawn do
 
     describe '#white_moves' do
       context 'When there is a piece on [3, 1] with no blocking pieces' do
-        it 'returns {[3, 2], [3, 3]}' do
-          @chess_board.add_piece([3, 1], Pawn, 'white')
+        before(:each) { @chess_board.add_piece([3, 1], Pawn, 'white')}
+        it 'returns {[3, 2], [3, 3]} if it hasn\'t moved' do
           result = Set[[3, 2], [3, 3]]
           expect(@chess_board[[3, 1]].piece.white_moves).to eq(result)
         end
+        it 'returns {[3, 2]} if it has moved' do
+          @chess_board[[3, 1]].piece.moved = true
+          result = Set[[3, 2]]
+          expect(@chess_board[[3, 1]].piece.white_moves).to eq(result)
+        end
       end
+
 
       context 'When there is a piece on [3, 1] and a friendly piece on [3, 2]' do
         it 'returns and empty set' do
@@ -71,7 +77,7 @@ describe Pawn do
         end
       end
 
-      context 'When there is a on [2, 6]' do
+      context 'When there is a piece on [2, 6]' do
         it 'returns {[2, 7]}' do
           @chess_board.add_piece([2, 6], Pawn, 'white')
           result = Set[[2, 7]]
@@ -121,9 +127,14 @@ describe Pawn do
 
   describe '#black_moves' do
     context 'When there is a piece on [4, 5] with no blocking pieces' do
-      it 'returns {[4, 4], [4, 3]}' do
-        @chess_board.add_piece([4, 5], Pawn, 'black')
+      before(:each) {@chess_board.add_piece([4, 5], Pawn, 'black')}
+      it 'returns {[4, 4], [4, 3]} if it hasn\'t moved' do
         result = Set[[4, 4], [4, 3]]
+        expect(@chess_board[[4, 5]].piece.black_moves).to eq(result)
+      end
+      it 'returns {[4, 4]} if it has moved' do
+        @chess_board[[4, 5]].piece.moved = true
+        result = Set[[4, 4]]
         expect(@chess_board[[4, 5]].piece.black_moves).to eq(result)
       end
     end
