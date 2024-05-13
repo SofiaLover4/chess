@@ -12,9 +12,9 @@ class Rook < Piece
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
     @symbol = if team == 'white'
-                '♜'
+                '♖'.black
               elsif team == 'black'
-                '♜'.grey
+                '♜'.black
               end
     @moved = false
     update_possible_moves

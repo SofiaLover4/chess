@@ -36,9 +36,9 @@ class ChessBoard
       j = 0
       while j < 8
         format = if (i + j).odd? # Color of the squares
-                   ->(content) { content.on_black }
+                   ->(content) { content.on_light_yellow }
                  else
-                   ->(content) { content.on_white }
+                   ->(content) { content.on_yellow }
                  end
 
         board[i].push(Square.new(format, [j, 7 - i]))
