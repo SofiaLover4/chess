@@ -10,13 +10,8 @@ class Pawn < Piece
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
-    @symbol = if team == 'white'
-                '♙'.black
-              elsif team == 'black'
-                '♟︎'.black
-              end
+    @symbol = team == 'white' ? '♙'.black : '♟︎'.black
     @moved = false
-    update_possible_moves
   end
 
   # Because a Pawn can only move twice if they haven't moved yet
@@ -33,6 +28,7 @@ class Pawn < Piece
     end
   end
 
+  # This method overwrites the possible_capture? method in the Piece class because pawns are a little different
   def possible_capture?(coordinates)
     !(out_of_bounds?(coordinates) || @board[coordinates].piece.nil? || @board[coordinates].piece.team == @team)
   end

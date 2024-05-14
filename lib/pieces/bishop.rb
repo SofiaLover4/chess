@@ -12,11 +12,8 @@ class Bishop < Piece
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
-    @symbol = if team == 'white'
-                '♗'.black
-              elsif team == 'black'
-                '♝'.black
-              end
+    @symbol = team == 'white' ? '♗'.black  : '♝'.black
+
   end
 
   def update_possible_moves
@@ -25,8 +22,5 @@ class Bishop < Piece
     @possible_moves.merge(right_moves(self)).merge(left_moves(self)).merge(forward_moves(self)).merge(back_moves(self))
   end
 
-  def possible_capture?(coordinates)
-    @board[coordinates].piece.team != @team
-  end
 
 end

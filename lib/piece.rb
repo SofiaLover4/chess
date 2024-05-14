@@ -25,4 +25,8 @@ class Piece
       @possible_moves
     end
   end
+
+  def possible_capture?(coordinates)
+    @board[coordinates].piece.team != @team
+  end
 end
