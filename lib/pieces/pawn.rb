@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../piece'
-require_relative '../board'
 
 # Pawn class for Chessboard
 class Pawn < Piece

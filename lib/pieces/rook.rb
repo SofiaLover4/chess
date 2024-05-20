@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../piece'
-require_relative '../board'
 require_relative './generic_moves/cross_moves'
 
 # Rook class for Chessboard
