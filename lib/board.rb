@@ -35,7 +35,7 @@ class ChessBoard
     while i < 8
       j = 0
       while j < 8
-        format = if (i + j).odd? # Color of the squares
+        format = if (i + j).even? # Color of the squares
                    ->(content) { content.on_light_yellow }
                  else
                    ->(content) { content.on_yellow }
@@ -59,12 +59,14 @@ class ChessBoard
   end
 
   def show_board
-    @board.each do |column|
+    @board.each_with_index do |column, i |
+      print " #{8 - i} "
       column.each do |square|
         print square.content
       end
       print "\n"
     end
+    puts '    a  b  c  d  e  f  g  h'
   end
 
   def [](coordinates)
