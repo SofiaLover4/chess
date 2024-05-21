@@ -25,7 +25,7 @@ end
 # A class for the board the user will see
 class ChessBoard
   # ChessBoard is going to be the graph
-  attr_accessor :board
+  attr_accessor :board, :white_in_play, :black_in_play
 
   def create_board # rubocop:disable Metrics/MethodLength
     # Creating the board with colored squares
@@ -50,12 +50,21 @@ class ChessBoard
   end
 
   def initialize
+    @white_in_play = Set.new
+    @black_in_play = Set.new
+    @white_out = Set.new
+    @black_out = Set.new
+    @white_king = nil
+    @black_king = nil
     # Class starts with an empty board
     @board = create_board
   end
 
   def add_piece(coordinates, piece, team)
-    self[coordinates].piece = piece.new(team, self, coordinates)
+    tmp = piece.new(team, self, coordinates)
+    @white_in_play.add(tmp) if team == 'white'
+    @black_in_play.add(tmp) if team == 'black'
+    self[coordinates].piece = (tmp)
   end
 
   def show_board
