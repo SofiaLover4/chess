@@ -37,7 +37,7 @@ describe Pawn do
     context 'When piece is on [3, 4] and there is an team piece on [4, 5] and enemy piece on [2, 5]' do
       it 'returns {[2, 5]}' do
         @chess_board.add_piece([3, 4], Pawn, 'white')
-        @chess_board.add_piece([2, 5], Pawn, 'white')
+        @chess_board.add_piece([4, 5], Pawn, 'white')
         @chess_board.add_piece([2, 5], Pawn, 'black')
         result = Set[[2, 5]]
         expect(@chess_board[[3, 4]].piece.white_capture_moves).to eq(result)
