@@ -52,7 +52,7 @@ class ChessBoard
     board
   end
 
-  def initialize(play = false)
+  def initialize(play: false)
     @white_in_play = Set.new
     @black_in_play = Set.new
     @white_out = Set.new
@@ -63,21 +63,24 @@ class ChessBoard
     @board = create_board
   end
 
+  def organize_piece(piece)
+    # Extra step for adding a King
+    if piece.team == 'white'
+      @white_king = piece if piece.is_a?(King)
+      @white_in_play.add(piece)
+    else
+      @black_king = piece if piece.is_a?(King)
+      @black_in_play.add(piece)
+    end
+  end
+
   def add_piece(coordinates, piece, team)
-    unless self[coordinates].piece.nil? do # To stop debugging rabbit holes
+    unless self[coordinates].piece.nil? # To stop debugging rabbit holes
       raise exception, 'piece is already in this square '
     end
 
     tmp = piece.new(team, self, coordinates)
-    # Extra step for adding a King
-    if team == 'white'
-      @white_king = tmp if piece == King
-      @white_in_play.add(tmp)
-    end
-    if team == 'black'
-      @black_king = tmp if piece == King
-      @black_in_play.add(tmp)
-    end
+    organize_piece(tmp)
     self[coordinates].piece = (tmp)
   end
 
@@ -94,6 +97,19 @@ class ChessBoard
 
   def [](coordinates)
     @board[7 - coordinates[1]][coordinates[0]]
+  end
+
+  # Update the moves of all the pieces in play
+  def update_all_pieces
+    @white_in_play.each { |piece| piece.update_possible_moves }
+    @black_in_play.each { |piece| piece.update_possible_moves }
+  end
+
+  def set_board
+    load_pawns
+    load_non_royals
+    load_royals
+    update_all_pieces
   end
 
   private
