@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'colorize'
+Dir["#{File.dirname(__FILE__)}/./pieces/*.rb"].each do |file|
+  require file
+end
 
 # Nodes where pieces will be stored within the game
 class Square
@@ -25,7 +28,7 @@ end
 # A class for the board the user will see
 class ChessBoard
   # ChessBoard is going to be the graph
-  attr_accessor :board, :white_in_play, :black_in_play
+  attr_accessor :board, :white_in_play, :black_in_play, :white_king, :black_king
 
   def create_board # rubocop:disable Metrics/MethodLength
     # Creating the board with colored squares
@@ -49,21 +52,32 @@ class ChessBoard
     board
   end
 
-  def initialize
+  def initialize(play = false)
     @white_in_play = Set.new
     @black_in_play = Set.new
     @white_out = Set.new
     @black_out = Set.new
     @white_king = nil
     @black_king = nil
-    # Class starts with an empty board
+    # Board will empty unless play is True
     @board = create_board
   end
 
   def add_piece(coordinates, piece, team)
+    unless self[coordinates].piece.nil? do # To stop debugging rabbit holes
+      raise exception, 'piece is already in this square '
+    end
+
     tmp = piece.new(team, self, coordinates)
-    @white_in_play.add(tmp) if team == 'white'
-    @black_in_play.add(tmp) if team == 'black'
+    # Extra step for adding a King
+    if team == 'white'
+      @white_king = tmp if piece == King
+      @white_in_play.add(tmp)
+    end
+    if team == 'black'
+      @black_king = tmp if piece == King
+      @black_in_play.add(tmp)
+    end
     self[coordinates].piece = (tmp)
   end
 
@@ -81,4 +95,35 @@ class ChessBoard
   def [](coordinates)
     @board[7 - coordinates[1]][coordinates[0]]
   end
+
+  private
+
+  # Loading in both white and black pawns onto the board
+  def load_pawns
+    8.times do |i|
+      add_piece([i, 1], Pawn, 'white')
+      add_piece([i, 6], Pawn, 'black')
+    end
+  end
+
+  # Loading in pieces that are not pawns, king, or queen
+  def load_non_royals
+    # start at each corner and as you go in change the piece you are adding
+    non_royals = [Rook, Knight, Bishop]
+    3.times do |i|
+      add_piece([i, 7], non_royals[i], 'black')
+      add_piece([7 - i, 7], non_royals[i], 'black')
+      add_piece([i, 0], non_royals[i],'white')
+      add_piece([7 - i, 0], non_royals[i], 'white')
+    end
+  end
+
+  # Loading in both kings onto the board
+  def load_royals
+    add_piece([4, 0], King, 'white')
+    add_piece([4, 7], King, 'black')
+    add_piece([3, 0], Queen, 'white')
+    add_piece([3, 7], Queen,'black')
+  end
+
 end
