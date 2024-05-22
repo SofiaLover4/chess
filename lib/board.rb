@@ -61,6 +61,7 @@ class ChessBoard
     @black_king = nil
     # Board will empty unless play is True
     @board = create_board
+    set_board if play
   end
 
   def organize_piece(piece)
