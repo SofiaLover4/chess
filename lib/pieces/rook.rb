@@ -21,7 +21,9 @@ class Rook < Piece
   def update_possible_moves
     # The moves are the same no matter the team
     @possible_moves = Set.new
-    @possible_moves.merge(right_moves(self)).merge(left_moves(self)).merge(forward_moves(self)).merge(back_moves(self))
+    CrossMoves.instance_methods(false).each do |method|
+      @possible_moves.merge(send(method, self))
+    end
   end
 
 end
