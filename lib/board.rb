@@ -121,6 +121,9 @@ class ChessBoard
       print "\n"
     end
     puts '    a  b  c  d  e  f  g  h'
+    puts "White has captured: #{out_set_to_s(@black_out)}"
+    puts "Black has captured: #{out_set_to_s(@white_out)}"
+
   end
 
   def [](coordinates)
@@ -172,6 +175,7 @@ class ChessBoard
       add_piece([i, 0], non_royals[i],'white')
       add_piece([7 - i, 0], non_royals[i], 'white')
     end
+
   end
 
   # Loading in both kings onto the board
@@ -180,6 +184,18 @@ class ChessBoard
     add_piece([4, 7], King, 'black')
     add_piece([3, 0], Queen, 'white')
     add_piece([3, 7], Queen,'black')
+  end
+
+  # For displaying the pieces that have been captured. Pieces are displayed in order of
+  # decreasing rank
+  def out_set_to_s(out_set)
+    piece_dict = { Queen => 1, Rook => 2, Bishop => 3, Knight => 4, Pawn => 5 }
+    pieces = out_set.to_a
+    sorted_pieces = pieces.sort_by { |piece| piece_dict[piece.class] }
+    pieces_string = ''
+    sorted_pieces.each { |piece| pieces_string += " #{piece.symbol} "}
+
+    pieces_string
   end
 
 end
