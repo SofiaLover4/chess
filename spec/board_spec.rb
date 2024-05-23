@@ -59,4 +59,43 @@ describe ChessBoard do
       end
     end
   end
+
+  describe '#move_piece' do
+    before(:each) do
+      @board = described_class.new
+      @board.add_piece([1, 0], Knight, 'white')
+      @board.add_piece([0, 2], Pawn, 'white')
+      @board.add_piece([2, 2], Pawn, 'black')
+      @knight = @board[[1, 0]].piece
+      @pawn = @board[[2, 2]].piece
+    end
+
+    it 'raises the correct errors' do
+      expect { @board.move_piece([-1, 0], [0, 0]) }.to raise_error(StandardError, 'trying to access coordinates out of bounds')
+      expect { @board.move_piece([1, 0], [10, 12])}.to raise_error(StandardError, 'trying to access coordinates out of bounds')
+      expect { @board.move_piece([1, 0], [0, 2])}.to raise_error(StandardError, 'friendly piece trying to be captured')
+      expect { @board.move_piece([0,0], [1, 0])}.to raise_error(StandardError, 'no piece in this square')
+    end
+
+    context 'a knight will capture a pawn' do
+      before do
+        @board.move_piece([1, 0], [2, 2])
+      end
+
+      it 'updates the moved piece and taken out piece ccoordinate\'s correctly ' do
+        expect(@knight.coordinates).to eq([2, 2])
+        expect(@pawn.coordinates).to eq(nil)
+      end
+
+      # Pawn should be in the black_out set and taken out of the black_in_play set
+      it 'updates the correct sets' do
+        expect(@board.white_in_play).to include(@knight)
+        expect(@board.white_out).not_to include(@knight)
+        expect(@board.black_in_play).not_to include(@pawn)
+        expect(@board.black_out).to include(@pawn)
+      end
+
+    end
+
+  end
 end

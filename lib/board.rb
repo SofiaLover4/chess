@@ -28,7 +28,7 @@ end
 # A class for the board the user will see
 class ChessBoard
   # ChessBoard is going to be the graph
-  attr_accessor :board, :white_in_play, :black_in_play, :white_king, :black_king
+  attr_accessor :board, :white_in_play, :black_in_play, :white_king, :black_king, :white_out, :black_out
 
   def create_board # rubocop:disable Metrics/MethodLength
     # Creating the board with colored squares
@@ -77,12 +77,39 @@ class ChessBoard
 
   def add_piece(coordinates, piece, team)
     unless self[coordinates].piece.nil? # To stop debugging rabbit holes
-      raise exception, 'piece is already in this square '
+      raise 'piece is already in this square '
     end
 
     tmp = piece.new(team, self, coordinates)
     organize_piece(tmp)
     self[coordinates].piece = (tmp)
+  end
+
+  def out_of_bounds?(coordinates)
+    x = coordinates[0]
+    y = coordinates[1]
+
+    x < 0 || x > 7 || y < 0 || y > 7
+  end
+
+  # You move the piece at the start_coord to the location at the end_coord
+  # If there is a piece there it must be an enemy piece and it will be 'captured'
+  # Method does NOT take into account if the move is a valid_move, that will be for the game to decide
+  def move_piece(start_coord, end_coord)
+    raise StandardError, 'trying to access coordinates out of bounds' if out_of_bounds?(start_coord) || out_of_bounds?(end_coord)
+
+    raise StandardError, 'no piece in this square' if self[start_coord].piece.nil?
+
+    piece = self[start_coord].piece
+    unless self[end_coord].piece.nil?
+      raise StandardError, 'friendly piece trying to be captured' if self[end_coord].piece.team == piece.team
+
+      take_out(self[end_coord].piece)
+    end
+    self[start_coord].piece = nil
+    self[end_coord].piece = piece
+    piece.coordinates = end_coord
+
   end
 
   def show_board
@@ -114,6 +141,18 @@ class ChessBoard
   end
 
   private
+
+  # Method goes hand in hand with #move_piece
+  def take_out(piece)
+    piece.coordinates = nil
+    if piece.team == 'white'
+      @white_in_play.delete(piece)
+      @white_out.add(piece)
+    else # The team is black
+      @black_in_play.delete(piece)
+      @black_out.add(piece)
+    end
+  end
 
   # Loading in both white and black pawns onto the board
   def load_pawns
