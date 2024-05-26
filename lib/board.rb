@@ -4,6 +4,9 @@ require 'colorize'
 Dir["#{File.dirname(__FILE__)}/./pieces/*.rb"].each do |file|
   require file
 end
+Dir["#{File.dirname(__FILE__)}/./board_modules/*.rb"].each do |file|
+  require file
+end
 
 # Nodes where pieces will be stored within the game
 class Square
@@ -33,6 +36,8 @@ end
 class ChessBoard
   # ChessBoard is going to be the graph
   attr_accessor :board, :white_in_play, :black_in_play, :white_king, :black_king, :white_out, :black_out
+
+  include SetUp
 
   def create_board # rubocop:disable Metrics/MethodLength
     # Creating the board with colored squares
@@ -140,12 +145,6 @@ class ChessBoard
     @black_in_play.each { |piece| piece.update_possible_moves }
   end
 
-  def set_board
-    load_pawns
-    load_non_royals
-    load_royals
-    update_all_pieces
-  end
 
   private
 
@@ -159,35 +158,6 @@ class ChessBoard
       @black_in_play.delete(piece)
       @black_out.add(piece)
     end
-  end
-
-  # Loading in both white and black pawns onto the board
-  def load_pawns
-    8.times do |i|
-      add_piece([i, 1], Pawn, 'white')
-      add_piece([i, 6], Pawn, 'black')
-    end
-  end
-
-  # Loading in pieces that are not pawns, king, or queen
-  def load_non_royals
-    # start at each corner and as you go in change the piece you are adding
-    non_royals = [Rook, Knight, Bishop]
-    3.times do |i|
-      add_piece([i, 7], non_royals[i], 'black')
-      add_piece([7 - i, 7], non_royals[i], 'black')
-      add_piece([i, 0], non_royals[i],'white')
-      add_piece([7 - i, 0], non_royals[i], 'white')
-    end
-
-  end
-
-  # Loading in both kings onto the board
-  def load_royals
-    add_piece([4, 0], King, 'white')
-    add_piece([4, 7], King, 'black')
-    add_piece([3, 0], Queen, 'white')
-    add_piece([3, 7], Queen,'black')
   end
 
   # For displaying the pieces that have been captured. Pieces are displayed in order of
