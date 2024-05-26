@@ -20,6 +20,10 @@ class Square
     format.call(@piece.nil? ? '   ' : " #{@piece.symbol} ")
   end
 
+  def piece?
+    !@piece.nil?
+  end
+
   def inspect
     "Square: #{@coordinates} \nPiece: #{@piece} \nViewable Content: #{content} "
   end
