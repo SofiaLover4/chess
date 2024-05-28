@@ -4,13 +4,13 @@ require_relative '../piece'
 
 # Pawn class for Chessboard
 class Pawn < Piece
-  attr_accessor :symbol, :capture_moves
+  attr_accessor :symbol, :capture_moves, :p_capture_moves
   attr_writer :moved
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
     @symbol = team == 'white' ? '♙'.black : '♟︎'.black
-    @capture_moves = nil
+    @p_capture_moves = nil
     @moved = false
   end
 
@@ -21,17 +21,17 @@ class Pawn < Piece
 
   def update_possible_moves
     @possible_moves = Set.new
-    @capture_moves = Set.new
+    @p_capture_moves = Set.new
     if @team == 'white'
-      @capture_moves = white_capture_moves
-      @possible_moves.merge(white_moves).merge(@capture_moves)
+      @p_capture_moves = p_white_capture_moves
+      @possible_moves.merge(white_moves).merge(white_capture_moves)
     else # There are only ever two teams
-      @capture_moves = black_capture_moves
-      @possible_moves.merge(black_moves).merge(@capture_moves)
+      @p_capture_moves = p_black_capture_moves
+      @possible_moves.merge(black_moves).merge(black_capture_moves)
     end
   end
 
-  # This method overwrites the possible_capture? method in the Piece class because pawns are a little different
+  # # This method overwrites the possible_capture? method in the Piece class because pawns are a little different
   def possible_capture?(coordinates)
     !(out_of_bounds?(coordinates) || @board[coordinates].piece.nil? || @board[coordinates].piece.team == @team)
   end
@@ -45,6 +45,19 @@ class Pawn < Piece
     capture_moves << [x + 1, y + 1] if possible_capture?([x + 1, y + 1])
 
     capture_moves
+  end
+
+  # For situations where a piece moves to the diagonal of Pawn and risks getting captured. This is mostly to make sure
+  # that the King can't do this
+  def p_white_capture_moves
+    p_capture_moves = Set.new
+    x = @coordinates[0]
+    y = @coordinates[1]
+
+    p_capture_moves << [x - 1, y + 1] if !out_of_bounds?([x - 1, y + 1])
+    p_capture_moves << [x + 1, y + 1] if !out_of_bounds?([x + 1, y + 1])
+
+    p_capture_moves
   end
 
   def white_moves
@@ -71,6 +84,17 @@ class Pawn < Piece
     capture_moves << [x + 1, y - 1] if possible_capture?([x + 1, y - 1])
 
     capture_moves
+  end
+
+  def p_black_capture_moves
+    p_capture_moves = Set.new
+    x = @coordinates[0]
+    y = @coordinates[1]
+
+    p_capture_moves << [x - 1, y - 1] if !out_of_bounds?([x - 1, y - 1])
+    p_capture_moves << [x + 1, y - 1] if !out_of_bounds?([x + 1, y - 1])
+
+    p_capture_moves
   end
 
   def black_moves

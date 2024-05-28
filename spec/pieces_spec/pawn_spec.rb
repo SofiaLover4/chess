@@ -165,4 +165,32 @@ describe Pawn do
       end
     end
   end
+
+  describe '#p_white_capture_moves' do
+    before(:each) {@chess_board.add_piece([0, 0], Pawn, 'white')}
+
+    context 'Pawn on [0, 0]' do
+      it 'returns [1, 1] with no enemy piece and enemy piece there' do
+        result = Set[[1, 1]]
+        expect(@chess_board[[0, 0]].piece.p_white_capture_moves).to eq(result)
+        @chess_board.add_piece([1, 1], Pawn, 'black')
+        expect(@chess_board[[0, 0]].piece.p_white_capture_moves).to eq(result)
+      end
+
+    end
+
+    describe '#p_black_capture_moves' do
+      before(:each) {@chess_board.add_piece([5, 5], Pawn, 'black') }
+
+      context 'Pawn on [5, 5]' do
+        it 'returns a set with [4, 4] and [6, 4] with no pieces and pieces on the board' do
+          result = Set[[4, 4], [6, 4]]
+          expect(@chess_board[[5, 5]].piece.p_black_capture_moves).to eq(result)
+          @chess_board.add_piece([4, 4], Pawn, 'white')
+          @chess_board.add_piece([6, 4], Pawn, 'black')
+          expect(@chess_board[[5, 5]].piece.p_black_capture_moves).to eq(result)
+        end
+      end
+    end
+  end
 end
