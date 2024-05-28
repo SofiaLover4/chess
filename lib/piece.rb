@@ -29,4 +29,22 @@ class Piece
   def possible_capture?(coordinates)
     @board[coordinates].piece.team != @team
   end
+
+  # Doesn't directly check if the piece is under attack but it allows a piece
+  # to check ANY squares that are under attack from the enemy team.
+  def square_under_attack?(coordinates)
+    # Choose which set of pieces in play
+    pieces_in_play = team == 'white' ? @board.black_in_play : @board.white_in_play
+
+    pieces_in_play.each do |piece|
+       if piece.is_a?(Pawn)
+         return true if piece.capture_moves.include?(coordinates)
+       elsif piece.possible_moves.include?(coordinates)
+         # For all other pieces that are not pawns
+         return true
+       end
+    end
+
+    false
+    end
 end
