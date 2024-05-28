@@ -4,12 +4,13 @@ require_relative '../piece'
 
 # Pawn class for Chessboard
 class Pawn < Piece
-  attr_accessor :symbol
+  attr_accessor :symbol, :capture_moves
   attr_writer :moved
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
     @symbol = team == 'white' ? '♙'.black : '♟︎'.black
+    @capture_moves = nil
     @moved = false
   end
 
@@ -20,10 +21,13 @@ class Pawn < Piece
 
   def update_possible_moves
     @possible_moves = Set.new
+    @capture_moves = Set.new
     if @team == 'white'
-      @possible_moves.merge(white_moves).merge(white_capture_moves)
+      @capture_moves = white_capture_moves
+      @possible_moves.merge(white_moves).merge(@capture_moves)
     else # There are only ever two teams
-      @possible_moves.merge(black_moves).merge(black_capture_moves)
+      @capture_moves = black_capture_moves
+      @possible_moves.merge(black_moves).merge(@capture_moves)
     end
   end
 
