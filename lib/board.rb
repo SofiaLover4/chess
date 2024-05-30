@@ -150,7 +150,6 @@ class ChessBoard
 
   # Method goes hand in hand with #move_piece
   def take_out(piece)
-    piece.coordinates = nil
     if piece.team == 'white'
       @white_in_play.delete(piece)
       @white_out.add(piece)
