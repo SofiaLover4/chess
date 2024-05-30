@@ -30,4 +30,8 @@ class Piece
     @board[coordinates].piece.team != @team
   end
 
+  def inspect
+    "#{@team} #{self.class} on #{@coordinates}:\nPossible Moves: #{@possible_moves}"
+  end
+
 end
