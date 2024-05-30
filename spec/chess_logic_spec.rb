@@ -11,19 +11,19 @@ describe ChessLogic do
         @board.add_piece([1, 1], Queen, 'white')
         @board.add_piece([1, 2], Pawn, 'black')
         @board.update_all_pieces
-        @game.board = @board
+        @logic.board = @board
       end
 
       it 'returns false if no piece is selected' do
-        expect(@game.valid_move?([7, 7], [1, 3])).to be false
+        expect(@logic.valid_move?([7, 7], [1, 3])).to be false
       end
 
       it 'returns false if the move is not valid' do
-        expect(@game.valid_move?([1, 1], [3, 2])).to be false
+        expect(@logic.valid_move?([1, 1], [3, 2])).to be false
       end
 
       it 'returns true if the move is valid' do
-        expect(@game.valid_move?([1, 1], [1, 2])).to be true
+        expect(@logic.valid_move?([1, 1], [1, 2])).to be true
       end
     end
   end
@@ -51,6 +51,43 @@ describe ChessLogic do
       @king.possible_moves.each do |move|
         expect(@logic.valid_move?([7, 7], move)).to be false
       end
+    end
+  end
+
+  describe '#pinned' do
+    before do # Various situations where some pieces should be pinned
+      board = ChessBoard.new
+      board.add_piece([0, 0], Rook, 'white')
+      board.add_piece([0, 7], King, 'black')
+      board.add_piece([0, 6 ], Knight, 'black')
+      board.add_piece([6, 5], Queen, 'black')
+      board.add_piece([3, 2], King, 'white')
+      board.add_piece([4, 3], Rook, 'white')
+      board.add_piece([2, 5], Pawn, 'black')
+      board.update_all_pieces
+      # p is pinned and np is not pinned
+      @logic = ChessLogic.new
+      @logic.board = board
+      @p_knight = board[[0, 6]].piece
+      @p_rook = board[[4, 3]].piece
+      @np_pawn = board[[2, 5]].piece
+      @np_rook = board[[0, 0]].piece
+    end
+
+    it 'returns true for the pinned knight' do
+      expect(@logic.pinned?(@p_knight)).to be true
+    end
+
+    it 'returns true for the pinned rook' do
+      expect(@logic.pinned?(@p_rook)).to be true
+    end
+
+    it 'returns false for the pawn that\'s not pinned ' do
+      expect(@logic.pinned?(@np_pawn)).to be false
+    end
+
+    it 'returns false for the rook that\'s not pinned ' do
+        expect(@logic.pinned?(@np_rook)).to be false
     end
   end
 end
