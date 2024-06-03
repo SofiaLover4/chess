@@ -28,12 +28,17 @@ class ChessLogic
 
   def valid_move?(start_coord, end_coord)
     # Should not have to worry about out of bounds errors, I am planning to make sure the user can only input
-    # valid board coordinates.
-    if @board[start_coord].piece?
-      if @board[start_coord].piece.is_a?(King)
-        return true if @board[start_coord].piece.possible_moves.include?(end_coord) && !square_under_attack?(end_coord, @board[start_coord].piece.team)
+    # valid board coordinates. This should run after user has selected a piece.
+
+    piece = @board[start_coord].piece
+    # The move should be in the piece's range and the move should be a valid hypothetical move i.e it doesn't put the
+    # king in check
+
+    if piece.possible_moves.include?(end_coord)
+      if piece.team == 'white'
+        return valid_hypothetical_move?(start_coord, end_coord, 'white',@board.black_in_play, @board.black_out)
       else
-        return true if @board[start_coord].piece? && @board[start_coord].piece.possible_moves.include?(end_coord)
+        return valid_hypothetical_move?(start_coord, end_coord, 'black',@board.white_in_play, @board.white_out)
       end
     end
 
@@ -65,11 +70,11 @@ class ChessLogic
     true
   end
 
-  # and if the king is in check mate
+  # Add checkmate and stale
 
   private
 
-  # A helper method for the #pinned? method. Returns true if the king is NOT in check if you make the hypothetical move,
+  # A helper method. Returns true if the king is NOT in check if you make the hypothetical move,
   # else false.
   def valid_hypothetical_move?(start, move_coordinates, team, enemy_in_play, outset)
     # Board should be the same after the method has run its course

@@ -10,12 +10,10 @@ describe ChessLogic do
         @board = ChessBoard.new
         @board.add_piece([1, 1], Queen, 'white')
         @board.add_piece([1, 2], Pawn, 'black')
+        @board.add_piece([3, 3], King, 'white') # King's are here just because they need to be on the board
+        @board.add_piece([5, 5], King, 'black')
         @board.update_all_pieces
         @logic.board = @board
-      end
-
-      it 'returns false if no piece is selected' do
-        expect(@logic.valid_move?([7, 7], [1, 3])).to be false
       end
 
       it 'returns false if the move is not valid' do
@@ -25,6 +23,10 @@ describe ChessLogic do
       it 'returns true if the move is valid' do
         expect(@logic.valid_move?([1, 1], [1, 2])).to be true
       end
+
+      it 'returns false if the king puts himself in check' do
+        expect(@logic.valid_move?([3, 3], [4, 4]))
+      end
     end
   end
 
@@ -33,6 +35,7 @@ describe ChessLogic do
       @logic = ChessLogic.new
       @board = ChessBoard.new
       @board.add_piece([7, 7], King, 'white')
+      @board.add_piece([0, 0], King, 'black')
       @board.update_all_pieces
       @king = @board[[7, 7]].piece
       @logic.board = @board
