@@ -70,18 +70,34 @@ class ChessLogic
     true
   end
 
-  # Add checkmate and stale
-
   # The argument is the team being checked for a stalemate
   def stale_mate?(team)
     # Choose which pieces in play you are checking
     pieces_in_play = team == 'white' ? @board.white_in_play : @board.black_in_play
+    return false if in_check?(team) # King can't in check for a stalemate
 
     pieces_in_play.each do |piece|
       piece.possible_moves.each do |move|
         return false if valid_move?(piece.coordinates, move)
       end
     end
+
+    true
+  end
+
+  # Argument is the team you want to verify check_mate for
+  def check_mate?(team)
+    # Checkmate logic should be fairly similar to stalemate logic, only difference is that the king has to be in check
+    pieces_in_play = team == 'white' ? @board.white_in_play : @board.black_in_play
+
+    return false unless in_check?(team)
+
+    pieces_in_play.each do |piece|
+      piece.possible_moves.each do |move|
+        return false if valid_move?(piece.coordinates, move)
+      end
+    end
+
     true
   end
 

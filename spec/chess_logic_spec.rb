@@ -137,4 +137,60 @@ describe ChessLogic do
       expect(logic.stale_mate?('black')).to be false
     end
   end
+
+  describe  '#check_mate' do
+    context 'simple board set up with two rooks' do
+      before(:each) do
+        @board = ChessBoard.new
+
+        @board.add_piece([0, 1], King, 'white')
+        @board.add_piece([7, 7], King, 'black')
+        @board.add_piece([0, 7], Rook, 'black')
+        @board.add_piece([1, 6], Rook, 'black')
+        @board.update_all_pieces
+        @logic = ChessLogic.new
+        @logic.board = @board
+      end
+      it 'returns true for a simple checkmate' do
+        expect(@logic.check_mate?('white')).to be true
+      end
+
+      it 'returns false for a situation where you can get out of check(possible capture for the piece causing check)' do
+        @board.add_piece([5, 7], Rook, 'white')
+        @board.update_all_pieces
+        expect(@logic.check_mate?('white')).to be false
+      end
+
+      it 'returns false for a situation where you back block check' do
+        @board.add_piece([5, 5], Rook, 'white')
+        @board.update_all_pieces
+        expect(@logic.check_mate?('white')).to be false
+      end
+    end
+
+    context 'more complicated check_mate set up ' do
+      before(:each) do
+        @board = ChessBoard.new
+
+        @board.add_piece([0, 7], King, 'black')
+        @board.add_piece([1, 6], Rook, 'black')
+        @board.add_piece([0, 0], King, 'white')
+        @board.add_piece([1, 1], Queen, 'black')
+        @board.add_piece([4, 3], Bishop, 'white')
+        @board.update_all_pieces
+        @logic = ChessLogic.new
+        @logic.board = @board
+      end
+
+      it 'returns true' do
+        expect(@logic.check_mate?('white')).to be true
+      end
+
+      it 'returns false if you can take out the piece causing check' do
+        @board.add_piece([5, 5], Bishop, 'white')
+        @board.update_all_pieces
+        expect(@logic.check_mate?('white')).to be false
+      end
+    end
+  end
 end
