@@ -72,6 +72,19 @@ class ChessLogic
 
   # Add checkmate and stale
 
+  # The argument is the team being checked for a stalemate
+  def stale_mate?(team)
+    # Choose which pieces in play you are checking
+    pieces_in_play = team == 'white' ? @board.white_in_play : @board.black_in_play
+
+    pieces_in_play.each do |piece|
+      piece.possible_moves.each do |move|
+        return false if valid_move?(piece.coordinates, move)
+      end
+    end
+    true
+  end
+
   private
 
   # A helper method. Returns true if the king is NOT in check if you make the hypothetical move,
@@ -85,11 +98,11 @@ class ChessLogic
     enemy_in_play.each { |piece| piece.update_possible_moves }
     checked = !in_check?(team)
     @board.move_piece(move_coordinates, start) # undo the move
-    enemy_in_play.each { |piece| piece.update_possible_moves }
     # } moving
 
     outset.delete?(tmp)
     @board.add_piece(tmp.coordinates, tmp.class, tmp.team) unless tmp.nil? # If you did take out a piece add it back in
+    enemy_in_play.each { |piece| piece.update_possible_moves }
     checked
   end
 

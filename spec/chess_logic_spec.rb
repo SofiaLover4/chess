@@ -93,4 +93,48 @@ describe ChessLogic do
         expect(@logic.pinned?(@np_rook)).to be false
     end
   end
+
+  describe '#stale_mate?' do
+    # Here I'm going to set up the board in the test, a context block seems unnecessary
+    it 'returns true in a simple stalemate situation' do
+      board = ChessBoard.new
+      board.add_piece([0, 7], King, 'white')
+      board.add_piece([5, 1], Queen, 'white')
+      board.add_piece([7, 0], King, 'black')
+      board.update_all_pieces
+      logic = ChessLogic.new
+      logic.board = board
+
+      expect(logic.stale_mate?('black')).to be true
+    end
+
+    it 'returns true in a more complicated stalemate situation' do
+      board = ChessBoard.new
+
+      board.add_piece([0, 7], King, 'black')
+      board.add_piece([7, 7], Rook, 'black')
+      board.add_piece([6, 7], Queen, 'black')
+      board.add_piece([2, 5], Knight, 'black')
+      board.add_piece([0, 4], Pawn, 'black')
+      board.add_piece([0, 1], Rook, 'black')
+      board.add_piece([0, 3], Pawn, 'white')
+      board.add_piece([2, 4], Pawn, 'white')
+      board.add_piece([7, 5], Bishop, 'white')
+      board.add_piece([7, 0], King, 'white')
+      board.update_all_pieces
+      logic = ChessLogic.new
+      logic.board = board
+
+      expect(logic.stale_mate?('white')).to be true
+    end
+
+    it 'returns false in a non-stalemate situation' do
+      board = ChessBoard.new(play: true)
+      logic = ChessLogic.new
+      logic.board = board
+
+      expect(logic.stale_mate?('white')).to be false
+      expect(logic.stale_mate?('black')).to be false
+    end
+  end
 end
