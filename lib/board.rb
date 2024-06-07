@@ -14,17 +14,41 @@ class Square
 
   def initialize(format, coordinates)
     # The board will be read using [x, y]
-    @format = format # Format is supposed to be a function
+    @default_format = format # Format is supposed to be a function
+    @current_format = @default_format
     @coordinates = coordinates
     @piece = nil
   end
 
   def content
-    format.call(@piece.nil? ? '   ' : " #{@piece.symbol} ")
+    @current_format.call(@piece.nil? ? '   ' : " #{@piece.symbol} ")
   end
 
   def piece?
     !@piece.nil?
+  end
+
+  # Purpose is to highlight the selected moves of a piece
+  def highlight_possible_move
+    @current_format = if !piece?
+                        if (coordinates[0] + coordinates[1]).odd?
+                          ->(content) { content.on_light_green }
+                        else
+                          ->(content) { content.on_green }
+                        end
+                      else # There is a piece
+                        ->(content) { content.on_light_red }
+                      end
+  end
+
+  # Purpose is for highlighting the square square the user selected
+  def highlight_selected
+    @current_format = ->(content) { content.on_light_cyan }
+  end
+
+  # Will be used for resetting any highlighting
+  def clear
+    @current_format = @default_format
   end
 
   def inspect
@@ -85,9 +109,7 @@ class ChessBoard
   end
 
   def add_piece(coordinates, piece, team)
-    unless self[coordinates].piece.nil? # To stop debugging rabbit holes
-      raise 'piece is already in this square '
-    end
+    raise 'piece is already in this square' unless self[coordinates].piece.nil? # To stop debugging rabbit holes
 
     tmp = piece.new(team, self, coordinates)
     organize_piece(tmp)
@@ -143,6 +165,10 @@ class ChessBoard
   def update_all_pieces
     @white_in_play.each { |piece| piece.update_possible_moves }
     @black_in_play.each { |piece| piece.update_possible_moves }
+  end
+
+  def clear_all_highlighting
+    @board.each { |column| column.each {|square| square.clear } }
   end
 
 
