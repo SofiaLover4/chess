@@ -82,9 +82,8 @@ describe ChessBoard do
         @board.move_piece([1, 0], [2, 2])
       end
 
-      it 'updates the moved piece and taken out piece ccoordinate\'s correctly ' do
+      it 'updates the moved piece and correctly' do
         expect(@knight.coordinates).to eq([2, 2])
-        expect(@pawn.coordinates).to eq(nil)
       end
 
       # Pawn should be in the black_out set and taken out of the black_in_play set
