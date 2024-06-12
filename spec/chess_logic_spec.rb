@@ -193,4 +193,36 @@ describe ChessLogic do
       end
     end
   end
+
+  describe "#open_to_en_passant?" do
+    before(:each) do
+      @board = ChessBoard.new
+      @board.add_piece([0, 0], Pawn, 'white')
+      @board.add_piece([7, 7], Rook, 'white')
+      @board.add_piece([0, 7], Pawn, 'black')
+      @logic = ChessLogic.new(board: @board)
+    end
+
+    it 'returns false if the piece being analyzed isn\'t a pawn' do
+      expect(@logic.open_to_en_passant?(@board[[7, 7]].piece, [7, 5])).to be false
+    end
+
+    it 'returns false if the pawn being analyzed has already moved' do
+      @board[[0, 0]].piece.moved = true
+      expect(@logic.open_to_en_passant?(@board[[0, 0]].piece, [0, 2])).to be false
+    end
+
+    it 'returns false if the proposed move is not two jumps ahead' do
+      expect(@logic.open_to_en_passant?(@board[[0, 0]].piece, [0, 1])).to be false
+    end
+
+    it 'returns true if the piece being analyzed is a white pawn and the proposed move is 2 jumps ahead for' do
+      expect(@logic.open_to_en_passant?(@board[[0, 0]].piece, [0, 2])).to be true
+    end
+
+    it 'returns true if the piece being analyzed is a black pawn and the proposed move is 2 jumps ahead' do
+      expect(@logic.open_to_en_passant?(@board[[0, 7]].piece, [0, 5])).to be true
+    end
+
+  end
 end

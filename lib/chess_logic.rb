@@ -45,6 +45,11 @@ class ChessLogic
     false
   end
 
+  def open_to_en_passant?(piece, move_square)
+    piece_coord = piece.coordinates
+    piece.is_a?(Pawn) && !piece.moved? && (piece_coord[1] + 2 == move_square[1] || piece_coord[1] - 2 == move_square[1])
+  end
+
   # Parameter should only be a King piece
   def in_check?(team)
     # Both Kings will have to be loaded on the board
