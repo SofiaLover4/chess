@@ -167,6 +167,11 @@ class ChessBoard
     @black_in_play.each { |piece| piece.update_possible_moves }
   end
 
+  def update_moves_for(team)
+    @white_in_play.each { |piece| piece.update_possible_moves } if team == 'white'
+    @black_in_play.each { |piece| piece.update_possible_moves } if team == 'black'
+  end
+
   def clear_all_highlighting
     @board.each { |column| column.each {|square| square.clear } }
   end
