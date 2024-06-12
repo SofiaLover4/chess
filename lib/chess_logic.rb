@@ -6,8 +6,8 @@ class ChessLogic
 
   attr_accessor :board
 
-  def initialize
-    @board = ChessBoard.new
+  def initialize(board: ChessBoard.new)
+    @board = board
   end
 
   def square_under_attack?(coordinates, team)
