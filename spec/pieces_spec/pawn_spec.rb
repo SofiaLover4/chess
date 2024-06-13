@@ -193,4 +193,32 @@ describe Pawn do
       end
     end
   end
+
+  describe '#add_en_passant_move' do
+    before(:each) do
+      @board = ChessBoard.new
+      @board.add_piece([3, 3], Pawn, 'white')
+      @board.add_piece([4, 3], Pawn, 'white')
+      @board.add_piece([2, 3], Pawn, 'black')
+      @board.update_all_pieces
+    end
+
+    it 'gives the correct attack move a black pawn and it gives no move to a white pawn ' do
+      @board[[3, 3]].piece.add_en_passant_move
+      expect(@board[[4, 3]].piece.possible_moves).not_to include([3, 2])
+      expect(@board[[2, 3]].piece.possible_moves).to include([3, 2])
+    end
+
+    it 'gives the correct attack move a white pawn' do
+      @board[[2, 3]].piece.add_en_passant_move
+      expect(@board[[3, 3]].piece.possible_moves).to include([2, 4])
+    end
+
+    it 'removes the en_passant attack after the pawns are updated again' do
+      @board[[3, 3]].piece.add_en_passant_move
+      @board.update_all_pieces
+      expect(@board[[2, 3]].piece.en_passant_attk).to eq(nil)
+      expect(@board[[2, 3]].piece.possible_moves).not_to include([3, 2])
+    end
+  end
 end

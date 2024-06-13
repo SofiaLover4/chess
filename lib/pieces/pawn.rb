@@ -4,13 +4,14 @@ require_relative '../piece'
 
 # Pawn class for Chessboard
 class Pawn < Piece
-  attr_accessor :symbol, :capture_moves, :p_capture_moves
+  attr_accessor :symbol, :capture_moves, :p_capture_moves, :en_passant_attk
   attr_writer :moved
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
     @symbol = team == 'white' ? '♙'.black : '♟︎'.black
     @p_capture_moves = nil
+    @en_passant_attk = nil
     @moved = false
   end
 
@@ -22,6 +23,7 @@ class Pawn < Piece
   def update_possible_moves
     @possible_moves = Set.new
     @p_capture_moves = Set.new
+    @en_passant_attk = nil
     if @team == 'white'
       @p_capture_moves = p_white_capture_moves
       @possible_moves.merge(white_moves).merge(white_capture_moves)
@@ -110,5 +112,23 @@ class Pawn < Piece
     end
 
     moves
+  end
+
+  # Should be used after a Pawn is moved and it is left open for en passant. Method updates the possible moves of adjacent enemy pawns to include the square where an en passant can take place.
+  def add_en_passant_move
+    x = @coordinates[0]
+    y = @coordinates[1]
+
+    attack_square = @team == 'white' ? [x, y - 1] : [x, y + 1]
+
+    if !out_of_bounds?([x - 1, y]) && @board[[x - 1, y]].piece? && @board[[x - 1, y]].piece.team != @team && @board[[x - 1, y]].piece.is_a?(Pawn)
+      @board[[x - 1, y]].piece.en_passant_attk = attack_square
+      @board[[x - 1, y]].piece.possible_moves.add(attack_square)
+    end
+    if !out_of_bounds?([x - 1, y]) && @board[[x + 1, y]].piece? && @board[[x + 1, y]].piece.team != @team && @board[[x + 1, y]].piece.is_a?(Pawn)
+      @board[[x + 1, y]].piece.en_passant_attk = attack_square
+      @board[[x + 1, y]].piece.possible_moves.add(attack_square)
+    end
+
   end
 end
