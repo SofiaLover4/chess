@@ -15,7 +15,7 @@ class ChessLogic
     pieces_in_play = team == 'white' ? @board.black_in_play : @board.white_in_play
 
     pieces_in_play.each do |piece|
-      if piece.is_a?(Pawn) # This problem with this is that there's actually nothing in the square so you are gonna have to update this tomorrow
+      if piece.is_a?(Pawn)
         return true if piece.p_capture_moves.include?(coordinates)
       elsif piece.possible_moves.include?(coordinates)
         # For all other pieces that are not pawns
@@ -50,7 +50,25 @@ class ChessLogic
     piece.is_a?(Pawn) && !piece.moved? && (piece_coord[1] + 2 == move_square[1] || piece_coord[1] - 2 == move_square[1])
   end
 
-  # Parameter should only be a King piece
+  # Coordinates used with this method should only ever be the bottom and top right and left corners of the board
+  def can_castle_from?(coord, team)
+    return false unless @board[coord].piece? && @board[coord].piece.is_a?(Rook) && @board[coord].piece.team == team
+
+    rook = @board[coord].piece
+    king = team == 'white' ? @board.white_king : @board.black_king
+    row = team == 'white' ? 0 : 7
+    return false if king.moved? || rook.moved? || in_check?(team)
+
+    coords = []
+
+    coords = [[2, row], [3, row]] if rook.coordinates[0] == 0 # The user is trying to castle queen side
+    coords = [[5, row], [6, row]] if rook.coordinates[0] == 7 # The user is trying to castle king side
+
+    coords.all? { |coord| @board[coord].piece.nil? && !square_under_attack?(coord, team) }
+  end
+
+
+  # Parameter should only be a team
   def in_check?(team)
     # Both Kings will have to be loaded on the board
     king = team == 'white' ? @board.white_king : @board.black_king

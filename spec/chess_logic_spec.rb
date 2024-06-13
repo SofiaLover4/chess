@@ -223,6 +223,54 @@ describe ChessLogic do
     it 'returns true if the piece being analyzed is a black pawn and the proposed move is 2 jumps ahead' do
       expect(@logic.open_to_en_passant?(@board[[0, 7]].piece, [0, 5])).to be true
     end
+  end
 
+  describe '#can_castle_with?' do
+    before(:each) do
+      @board = ChessBoard.new()
+      @board.add_piece([0, 0], Rook, 'white')
+      @board.add_piece([7, 0], Rook, 'white')
+      @board.add_piece([4, 0], King, 'white')
+      @board.add_piece([0, 7], Rook, 'black')
+      @board.add_piece([7, 7], Rook, 'black')
+      @board.add_piece([4, 7], King, 'black')
+      @board.update_all_pieces
+      @logic = ChessLogic.new(board: @board)
+    end
+
+    it 'it returns true for valid castling situations' do
+      expect(@logic.can_castle_from?([0, 0], 'white')).to be true
+      expect(@logic.can_castle_from?([7, 7], 'black')).to be true
+    end
+
+    it 'returns false where there\'s a piece blocking the castle' do
+      @board.add_piece([6, 0], Pawn, 'white')
+      @board.add_piece([2, 7], Pawn, 'black')
+      @board.update_all_pieces
+
+      expect(@logic.can_castle_from?([7, 0], 'white')).to be false
+      expect(@logic.can_castle_from?([0, 7], 'black')).to be false
+    end
+
+    it 'returns false when the king is in check' do
+      @board.add_piece([4, 5], Rook, 'white')
+      @board.add_piece([4, 4], Rook, 'black')
+      @board.update_all_pieces
+
+
+
+      expect(@logic.can_castle_from?([7, 0], 'white')).to be false
+      expect(@logic.can_castle_from?([0, 7], 'black')).to be false
+
+      expect(@logic.can_castle_from?([0, 0], 'white')).to be false
+      expect(@logic.can_castle_from?([7, 7], 'black')).to be false
+    end
+
+    it 'returns false if the rook or king has moved' do
+      w_rook = @board[[0, 0]].piece
+      w_rook.moved = true
+
+      expect(@logic.can_castle_from?([0, 0], 'white')).to be false
+    end
   end
 end
