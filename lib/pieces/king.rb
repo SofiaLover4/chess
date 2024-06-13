@@ -4,7 +4,7 @@ require_relative '../piece'
 
 # King piece for Chessboard
 class King < Piece
-  attr_accessor :symbol
+  attr_accessor :symbol, :moved
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)

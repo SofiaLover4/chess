@@ -5,7 +5,7 @@ require_relative './generic_moves/cross_moves'
 
 # Rook class for Chessboard
 class Rook < Piece
-  attr_accessor :symbol, :board
+  attr_accessor :symbol, :board, :moved
 
   include CrossMoves
   def initialize(team, board, coordinates)
