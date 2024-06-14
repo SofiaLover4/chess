@@ -14,7 +14,11 @@ class GamePlay
   end
 
   def switch_team
+    # Usually after a switch the board messages and highlighting and should be reset
+    @board.clear_all_highlighting
+    @message = nil
     @current_team = @current_team == 'white' ? 'black' : 'white'
+    @board.update_moves_for(@current_team) # Now that the team has switched update the new player's move
   end
 
   def display_game
@@ -35,16 +39,23 @@ class GamePlay
     # 4. if neither of these work just run back up to the top of the loop
     # Something else important to keep track of is that teams should switch
     loop do
-      @board.show_board
+      display_game
       print "So, #{@current_team} what will you do?: "
       user_input = gets.chomp.downcase
-      if user_input == 'end'
+      case user_input
+
+      when 'end'
         break
-      elsif user_input == 'm'
+      when 'm'
         select_piece_menu
+      when 'c'
+        castle_menu
       end
+
     end
   end
+
+  # Last two 'special' things to implement is castling and promotions
 
   def select_piece_menu
     original_team = @current_team
@@ -133,15 +144,9 @@ class GamePlay
           @board.move_piece([piece.en_passant_attk[0], piece_square[1]], piece_square)
         end
 
-        @board.move_piece(piece_square, move_coord)
+        formally_move(piece_square, move_coord)
 
-
-        # For special pieces like Pawns, where their possible moves depend on if the piece has moved or not
-        piece.moved = true if piece.is_a?(Pawn) || piece.is_a?(King) || piece.is_a?(Rook)
-
-        @message = nil
         switch_team # Player has made a valid move, so it's no longer their turn
-        @board.update_moves_for(@current_team) # Now that the team has switch update the new player's movee
 
         piece.add_en_passant_move if piece.is_a?(Pawn) && open_to_en_passant # For a future en passant attack
         break
@@ -149,6 +154,78 @@ class GamePlay
         @message = 'Sorry, but that is not a valid move'
       end
     end
-
   end
+
+  def castle_menu
+    castle_sides = valid_castling_sides
+    row = @current_team == 'white' ? 0 : 7
+
+    loop do
+      if castle_sides.empty?
+        @message = "Sorry #{@current_team} but there is no way to castle. Please select a different command."
+        break
+      end
+
+      # Highlighting the King and the rooks that you can use to castle
+      @board[[0, row]].highlight_selected if castle_sides.include?('q')
+      @board[[7, row]].highlight_selected if castle_sides.include?('k')
+      @board[[4, row]].highlight_selected
+
+      display_game
+
+      print "Which side would you like to castle from (#{castle_sides} or type 'back')?: "
+      user_input = gets.chomp.downcase
+
+      if user_input == 'back'
+        @board.clear_all_highlighting
+        @message = nil
+        break
+      elsif user_input == 'q' && castle_sides.include?('q')
+        formally_move([4, row], [2, row])
+        formally_move([0, row], [3, row])
+        switch_team
+        break
+      elsif user_input == 'k' && castle_sides.include?('k')
+        formally_move([4, row], [6, row])
+        formally_move([7, row], [5, row])
+        switch_team
+        break
+      elsif (user_input == 'k' || user_input == 'q') && !(castle_sides.include?(user_input))
+        @message = "Sorry #{@current_team} but you cannot castle to this side"
+      else
+        @message = 'I didn\'t get that, could you try again'
+
+      end
+
+      @board.clear_all_highlighting
+
+    end
+  end
+
+  private
+
+  # Helper method for castle_menu
+  def valid_castling_sides
+    row = @current_team == 'white' ? 0 : 7
+    queen_sd = [0, row]
+    king_sd = [7, row]
+
+    valid_sds = ''
+
+    valid_sds += 'q' if @logic.can_castle_from?(queen_sd, @current_team)
+    valid_sds += 'k' if @logic.can_castle_from?(king_sd, @current_team)
+    valid_sds = 'q/k' if valid_sds.length == 2
+
+    valid_sds
+  end
+
+  # When a piece is formally moved, it's 'moved' status is also changed
+  def formally_move(start_coord, end_coord)
+    piece = @board[start_coord].piece
+    @board.move_piece(start_coord, end_coord)
+    # For special pieces like Pawns, where their possible moves depend on if the piece has moved or not
+    piece.moved = true if piece.is_a?(Pawn) || piece.is_a?(King) || piece.is_a?(Rook)
+  end
+
+
 end
