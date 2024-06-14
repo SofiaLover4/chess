@@ -146,6 +146,11 @@ class GamePlay
 
         formally_move(piece_square, move_coord)
 
+        # Promote the pawn if the pawn is moved into a promotion square {
+        promotable_pawn = pawn_to_promote
+        promotion_menu(promotable_pawn) unless promotable_pawn.nil?
+        # }
+
         switch_team # Player has made a valid move, so it's no longer their turn
 
         piece.add_en_passant_move if piece.is_a?(Pawn) && open_to_en_passant # For a future en passant attack
@@ -202,6 +207,27 @@ class GamePlay
     end
   end
 
+  def promotion_menu(pawn)
+    @board.clear_all_highlighting
+    coord = pawn.coordinates
+    @board[coord].highlight_selected
+    @message = "Congratulations #{@current_team}, you can promote this pawn! \nTo what piece would you like to promote your pawn (q, r, b, kn)?: "
+    promotion_pieces = {'q' => Queen, 'r' => Rook, 'b' => Bishop, 'kn' => Knight}
+    loop do # User will not be able to leave this loop until they promote a pawn
+      display_game
+      user_input = gets.chomp.downcase
+
+      if promotion_pieces.include?(user_input) # switch out the pieces
+        @board[coord].piece = nil # Remove the pawn
+        @board.add_piece(coord, promotion_pieces[user_input], @current_team)
+        @board[coord].piece.update_possible_moves
+        @message = nil
+        break
+      end
+      @message = "Sorry I didn\'t get that. The possible pieces you can promote to is a queen, rook, bishop, or knight. \nPlease type one of the following q, r, b, kn."
+    end
+  end
+
   private
 
   # Helper method for castle_menu
@@ -227,5 +253,13 @@ class GamePlay
     piece.moved = true if piece.is_a?(Pawn) || piece.is_a?(King) || piece.is_a?(Rook)
   end
 
+  def pawn_to_promote
+    row = @current_team == 'white' ? 7 : 0 # The row we will check for the pawn promotion
+    8.times do |i|
+      piece = @board[[i, row]].piece
+      return piece if !piece.nil? && piece.is_a?(Pawn) && piece.team == @current_team
 
+    end
+    nil # else nothing is returned, meaning there's nothing to promote
+  end
 end
