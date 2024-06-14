@@ -108,6 +108,62 @@ class ChessLogic
     true
   end
 
+  def special_draw?
+    only_kings? || not_enough_material? || bishop_draw?
+  end
+
+  # These are the draws where there is only two
+  def only_kings? # Note: in_play_set == 1 => there is only a king left
+    @board.white_in_play.length == 1 && @board.black_in_play.length == 1 # This means there are only two kings left
+  end
+
+  # When one team
+  def not_enough_material?
+    if @board.white_in_play.length == 1 && @board.black_in_play.length == 2
+      @board.black_in_play.each do |piece|
+        next if piece.is_a?(King)
+
+        return piece.is_a?(Knight) || piece.is_a?(Bishop)
+      end
+    end
+
+    if @board.white_in_play.length == 2 && @board.black_in_play.length == 1
+      @board.white_in_play.each do |piece|
+        next if piece.is_a?(King)
+
+        return piece.is_a?(Knight) || piece.is_a?(Bishop)
+      end
+    end
+
+    false # If neither situation happens then there is enough material
+  end
+
+  # For the draw situation where there is only a bishop with a king left on both sides and those bishops
+  # are on the same color square.
+  def bishop_draw?
+    w_bishop_coord = []
+    b_bishop_coord = []
+    return false unless @board.white_in_play.length == 2 && @board.black_in_play.length == 2
+    # Find both bishop's coordinates or return false if there is no bishop in the set
+    @board.white_in_play.each do |piece|
+      next if piece.is_a?(King)
+      return false unless piece.is_a?(Bishop)
+
+      w_bishop_coord = piece.coordinates
+    end
+
+    @board.black_in_play.each do |piece|
+      next if piece.is_a?(King)
+      return false unless piece.is_a?(Bishop)
+
+      b_bishop_coord = piece.coordinates
+    end
+
+
+    # If the parity of the sum of the coordinates of the squares match then the squares are on the same square
+    w_bishop_coord.sum % 2 == b_bishop_coord.sum % 2
+  end
+
   # Argument is the team you want to verify check_mate for
   def check_mate?(team)
     # Checkmate logic should be fairly similar to stalemate logic, only difference is that the king has to be in check

@@ -273,4 +273,100 @@ describe ChessLogic do
       expect(@logic.can_castle_from?([0, 0], 'white')).to be false
     end
   end
+
+  describe '#only_kings' do
+    it 'returns true when there is only kings on the board' do
+      board = ChessBoard.new
+      board.add_piece([0, 0], King, 'white')
+      board.add_piece([7, 7], King, 'black')
+
+      logic = ChessLogic.new(board: board)
+      expect(logic.only_kings?).to be true
+    end
+
+    it 'returns false when there is there are more than just kings' do
+      board = ChessBoard.new
+      board.add_piece([0, 0], King, 'white')
+      board.add_piece([7, 7], King, 'black')
+      board.add_piece([4, 4], Pawn, 'white')
+
+      logic = ChessLogic.new(board: board)
+      expect(logic.only_kings?).to be false
+
+      board = ChessBoard.new
+      board.add_piece([0, 0], King, 'white')
+      board.add_piece([7, 7], King, 'black')
+      board.add_piece([4, 4], Pawn, 'black')
+
+      logic = ChessLogic.new(board: board)
+      expect(logic.only_kings?).to be false
+    end
+  end
+
+  describe '#not_enough_material' do
+    before(:each) do
+      @board =  ChessBoard.new
+      @board.add_piece([0, 0], King, 'white')
+      @board.add_piece([7, 7], King, 'black')
+      @logic = ChessLogic.new(board: @board)
+    end
+
+    it 'returns true when white has a king and black has a king and a bishop' do
+      @board.add_piece([3, 3], Bishop, 'black')
+      expect(@logic.not_enough_material?).to be true
+    end
+
+    it 'returns true when white has a king and knight and black has a king' do
+      @board.add_piece([4, 4], Knight, 'white')
+      expect(@logic.not_enough_material?).to be true
+    end
+
+    it 'returns false when white has a rook' do
+      @board.add_piece([4, 4], Rook, 'white')
+      expect(@logic.not_enough_material?).to be false
+    end
+
+    it 'returns false for a newly set up chess board' do
+      logic = ChessLogic.new(board: ChessBoard.new(play: true))
+      expect(logic.not_enough_material?).to be false
+    end
+  end
+
+  describe '#bishop_draw' do
+    before(:each) do
+      @board =  ChessBoard.new
+      @board.add_piece([0, 0], King, 'white')
+      @board.add_piece([7, 7], King, 'black')
+      @logic = ChessLogic.new(board: @board)
+    end
+
+    it 'returns true for two bishops being on dark squares' do
+      @board.add_piece([3, 1], Bishop, 'white')
+      @board.add_piece([5, 3], Bishop, 'black')
+      expect(@logic.bishop_draw?).to be true
+    end
+
+    it 'returns true for two bishops being on light squares' do
+      @board.add_piece([0, 1], Bishop, 'white')
+      @board.add_piece([4, 5], Bishop, 'black')
+      expect(@logic.bishop_draw?).to be true
+    end
+
+    it 'returns false when bishops are on opposite color squares' do
+      @board.add_piece([3, 1], Bishop, 'white')
+      @board.add_piece([4, 5], Bishop, 'black')
+      expect(@logic.bishop_draw?).to be false
+    end
+
+    it 'returns false when there are not bishops on the board' do
+      @board.add_piece([3, 1], Rook, 'white')
+      @board.add_piece([4, 5], Queen, 'black')
+      expect(@logic.bishop_draw?).to be false
+    end
+
+    it 'returns false for a newly set up chess board' do
+      logic = ChessLogic.new(board: ChessBoard.new(play: true))
+      expect(logic.bishop_draw?).to be false
+    end
+  end
 end
