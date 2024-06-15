@@ -138,7 +138,7 @@ describe ChessLogic do
     end
   end
 
-  describe  '#check_mate' do
+  describe  '#check_mate?' do
     context 'simple board set up with two rooks' do
       before(:each) do
         @board = ChessBoard.new
