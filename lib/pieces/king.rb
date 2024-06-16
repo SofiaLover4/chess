@@ -27,4 +27,22 @@ class King < Piece
       @possible_moves.add(coord) if !out_of_bounds?(coord) && (board[coord].piece.nil? || possible_capture?(coord))
     end
   end
+
+  def dump_json
+    {
+      'team' => @team,
+      'coordinates' => @coordinates,
+      'moved' => @moved,
+      'possible_moves' => @possible_moves.to_a
+    }.to_json
+  end
+
+  def self.load_json(json_string, board)
+    data = JSON.parse(json_string)
+    new_king = self.new(data['team'], board, data['coordinates'])
+    new_king.moved = data['moved']
+    new_king.possible_moves = Set.new(data['possible_moves'])
+
+    new_king
+  end
 end

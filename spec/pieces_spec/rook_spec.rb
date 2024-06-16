@@ -129,4 +129,23 @@ describe Rook do
       end
     end
   end
+
+  describe '#dump_json & #load_json' do # The king will also have this same method so we will need not to test it that piece
+    it 'creates a new rook with the same instance variables' do
+      board = ChessBoard.new
+      board.add_piece([4, 4], Rook, 'black')
+      old_rook = board[[4, 4]].piece
+      old_rook.moved = true
+      board.update_all_pieces
+
+      string = old_rook.dump_json
+      new_rook = Rook.load_json(string, board)
+
+      expect(new_rook.team).to eq(old_rook.team)
+      expect(new_rook.coordinates).to eq(old_rook.coordinates)
+      expect(new_rook.possible_moves).to eq(old_rook.possible_moves)
+      expect(new_rook.moved).to eq(old_rook.moved)
+
+    end
+  end
 end
