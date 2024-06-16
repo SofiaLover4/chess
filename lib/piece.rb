@@ -3,12 +3,13 @@
 # A foundation for all the chess pieces
 class Piece
   attr_accessor :team, :board, :coordinates
+  attr_writer :possible_moves
 
   def initialize(team, board, coordinates)
     @team = team
     @board = board
     @coordinates = coordinates
-    @possible_moves = nil
+    @possible_moves = Set.new
   end
 
   def out_of_bounds?(coordinates)

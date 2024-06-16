@@ -216,4 +216,28 @@ describe Pawn do
       expect(@board[[3, 3]].piece.possible_moves).to include([2, 4])
     end
   end
+
+  describe '#dump_json & #load_json' do
+    it 'creates a new pawn with instance variables of the same value' do
+      board = ChessBoard.new
+      board.add_piece([0, 0], Pawn, 'black')
+      old_pawn = board[[0, 0]].piece
+      board.add_piece([1, 0], Pawn, 'white')
+      board[[1, 0]].piece.possible_en_passant = true
+      board.update_all_pieces
+      string = board[[0, 0]].piece.dump_json
+      new_pawn = Pawn.load_json(string, board)
+
+      # Every instance variable in both pawns have to match
+      expect(new_pawn.team).to eq(old_pawn.team)
+      expect(new_pawn.coordinates).to eq(old_pawn.coordinates)
+      expect(new_pawn.moved).to eq(old_pawn.moved)
+      expect(new_pawn.p_capture_moves).to eq(old_pawn.p_capture_moves)
+      expect(new_pawn.en_passant_attk).to eq(old_pawn.en_passant_attk)
+      expect(new_pawn.possible_en_passant).to eq(old_pawn.possible_en_passant)
+      expect(new_pawn.possible_moves).to eq(old_pawn.possible_moves)
+
+    end
+
+  end
 end

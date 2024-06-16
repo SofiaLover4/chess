@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 require_relative '../piece'
+require 'json'
 
 # Pawn class for Chessboard
 class Pawn < Piece
-  attr_accessor :symbol, :capture_moves, :p_capture_moves, :en_passant_attk, :possible_en_passant
-  attr_writer :moved
+  attr_accessor :symbol, :p_capture_moves, :en_passant_attk, :possible_en_passant, :moved
 
   def initialize(team, board, coordinates)
     super(team, board, coordinates)
     @symbol = team == 'white' ? '♙'.black : '♟︎'.black
-    @p_capture_moves = nil
+    @p_capture_moves = Set.new
     @en_passant_attk = nil
     @moved = false
     @possible_en_passant = false
@@ -130,8 +130,34 @@ class Pawn < Piece
       @en_passant_attk = [x - 1, y + row_move] unless out_of_bounds?([x - 1, y + row_move])
     end
     if !out_of_bounds?(right) && @board[right].piece? && @board[right].piece.team != @team && @board[right].piece.is_a?(Pawn) && @board[right].piece.possible_en_passant
-      @en_passant_attk = [x + 1, y + row_move] unless out_of_bounds?([x - 1, y + row_move])
+      @en_passant_attk = [x + 1, y + row_move] unless out_of_bounds?([x + 1, y + row_move])
     end
-
   end
+
+  def dump_json
+    # Notice the board isn't being dumped here. Be careful when loading from JSON
+    {
+      'team' => @team,
+      'coordinates' => @coordinates,
+      'moved' => @moved,
+      'p_capture_moves' => @p_capture_moves.to_a,
+      'en_passant_attk' => @en_passant_attk,
+      'possible_en_passant' => @possible_en_passant,
+      'possible_moves' => @possible_moves.to_a
+    }.to_json
+  end
+
+  def self.load_json(json_string, board) # A board will be needed upon loading a Pawn from JSON
+    data = JSON.parse(json_string)
+    new_pawn = self.new(data['team'], board, data['coordinates'])
+    new_pawn.moved = data['moved']
+    new_pawn.p_capture_moves = Set.new(data['p_capture_moves'])
+    new_pawn.en_passant_attk = data['en_passant_attk']
+    new_pawn.possible_en_passant = data['possible_en_passant']
+    new_pawn.possible_moves = Set.new(data['possible_moves'])
+
+    new_pawn
+    # Note: The pawn is not added to the board after this.
+  end
+
 end
