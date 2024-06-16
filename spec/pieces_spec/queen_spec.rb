@@ -30,4 +30,22 @@ describe Queen do
       end
     end
   end
+
+  describe '#dump_json and #load_json' do
+    # This is the same method that will be used for Bishop and Knight so this will be the only test case
+    it 'creates a new queen with the same instance variables' do
+      board = ChessBoard.new
+      board.add_piece([5, 5], Queen, 'black')
+      old_queen = board[[5, 5]].piece
+      board.update_all_pieces
+
+      string = old_queen.dump_json
+      new_queen = Queen.load_json(string, board)
+
+      expect(new_queen.team).to eq(old_queen.team)
+      expect(new_queen.coordinates).to eq(old_queen.coordinates)
+      expect(new_queen.possible_moves).to eq(old_queen.possible_moves)
+    end
+
+  end
 end

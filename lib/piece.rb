@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 # A foundation for all the chess pieces
 class Piece
   attr_accessor :team, :board, :coordinates
@@ -35,4 +37,20 @@ class Piece
     "#{@team} #{self.class} on #{@coordinates}:\nPossible Moves: #{@possible_moves}"
   end
 
+  def dump_json
+    {
+      'team' => @team,
+      'coordinates' => @coordinates,
+      'possible_moves' => @possible_moves.to_a
+    }.to_json
+  end
+
+  def self.load_json(json_string, board)
+    data = JSON.parse(json_string)
+
+    new_piece = self.new(data['team'], board, data['coordinates'])
+    new_piece.possible_moves = Set.new(data['possible_moves'])
+
+    new_piece
+  end
 end
