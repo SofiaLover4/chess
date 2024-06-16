@@ -141,11 +141,7 @@ describe Rook do
       string = old_rook.dump_json
       new_rook = Rook.load_json(string, board)
 
-      expect(new_rook.team).to eq(old_rook.team)
-      expect(new_rook.coordinates).to eq(old_rook.coordinates)
-      expect(new_rook.possible_moves).to eq(old_rook.possible_moves)
-      expect(new_rook.moved).to eq(old_rook.moved)
-
+      expect(new_rook).to eq(old_rook)
     end
   end
 end

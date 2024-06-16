@@ -41,10 +41,7 @@ describe Queen do
 
       string = old_queen.dump_json
       new_queen = Queen.load_json(string, board)
-
-      expect(new_queen.team).to eq(old_queen.team)
-      expect(new_queen.coordinates).to eq(old_queen.coordinates)
-      expect(new_queen.possible_moves).to eq(old_queen.possible_moves)
+      expect(new_queen).to eq(old_queen)
     end
 
   end

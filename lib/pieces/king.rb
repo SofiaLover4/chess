@@ -45,4 +45,10 @@ class King < Piece
 
     new_king
   end
+
+  def ==(other)
+    return false unless other.is_a?(King)
+
+    @team == other.team && @coordinates == other.coordinates && @moved == other.moved && @possible_moves == other.possible_moves
+  end
 end

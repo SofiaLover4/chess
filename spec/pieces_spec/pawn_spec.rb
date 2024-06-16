@@ -229,13 +229,7 @@ describe Pawn do
       new_pawn = Pawn.load_json(string, board)
 
       # Every instance variable in both pawns have to match
-      expect(new_pawn.team).to eq(old_pawn.team)
-      expect(new_pawn.coordinates).to eq(old_pawn.coordinates)
-      expect(new_pawn.moved).to eq(old_pawn.moved)
-      expect(new_pawn.p_capture_moves).to eq(old_pawn.p_capture_moves)
-      expect(new_pawn.en_passant_attk).to eq(old_pawn.en_passant_attk)
-      expect(new_pawn.possible_en_passant).to eq(old_pawn.possible_en_passant)
-      expect(new_pawn.possible_moves).to eq(old_pawn.possible_moves)
+      expect(new_pawn).to eq(old_pawn)
 
     end
 

@@ -53,4 +53,10 @@ class Piece
 
     new_piece
   end
+
+  def ==(other)
+    return false unless other.is_a?(self.class)
+
+    @team == other.team && @coordinates == other.coordinates && @possible_moves == other.possible_moves
+  end
 end

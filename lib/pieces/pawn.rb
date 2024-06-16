@@ -160,4 +160,18 @@ class Pawn < Piece
     # Note: The pawn is not added to the board after this.
   end
 
+  def ==(other)# For testing purposes
+    return false unless other.is_a?(Pawn)
+    same_team = @team == other.team
+    same_coord =  @coordinates == other.coordinates
+    same_moved = @moved == other.moved
+    same_p_capture_moves = @p_capture_moves == other.p_capture_moves
+    same_en_passant_attk = @en_passant_attk == other.en_passant_attk
+    same_possible_en_passant = @possible_en_passant == other.possible_en_passant
+    same_possible_moves = @possible_moves == other.possible_moves
+
+    same_team && same_coord && same_moved && same_p_capture_moves && same_en_passant_attk && same_possible_en_passant && same_possible_moves
+  end
+
+
 end

@@ -45,4 +45,10 @@ class Rook < Piece
     new_rook
   end
 
+  def ==(other)
+    return false unless other.is_a?(Rook)
+
+    @team == other.team && @coordinates == other.coordinates && @moved == other.moved && @possible_moves == other.possible_moves
+  end
+
 end
