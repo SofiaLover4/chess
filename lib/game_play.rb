@@ -5,12 +5,14 @@ require_relative 'chess_logic'
 
 # Where the actual chessGame will be played and the menus
 class GamePlay
+  attr_accessor :current_team, :game_over, :message
 
   def initialize(board: ChessBoard.new(play: true))
     @board = board
     @logic = ChessLogic.new(board: board) # Yeah this is some wierd annoying variable naming
     @current_team = 'white'
     @message = nil # For methods that want to give the user a message
+    @game_over = false
   end
 
   def switch_team
@@ -18,30 +20,30 @@ class GamePlay
     @board.clear_all_highlighting
     @message = nil
     @current_team = @current_team == 'white' ? 'black' : 'white'
-    @board.update_moves_for(@current_team) # Now that the team has switched update the new player's move
+    @board.update_all_pieces
+    pieces_in_play = @current_team == 'white' ? @board.white_in_play : @board.black_in_play
+    # So en passant is only possible immediately after the opportunity opens up
+    pieces_in_play.each { |piece| piece.possible_en_passant = false if piece.is_a?(Pawn) }
   end
 
   def display_game
     @board.show_board
     puts @message unless @message.nil?
   end
+
   def play_menu
-    # Idea is to have several different commands that a user can input after they have started the game
-    # In a sense this is the 'main' screen the user will be interacting with
-    # The idea is to have the options as ...
-    # 1. end - this option ends the game and ideally lets the user choose with they want to save the current game that t
-    #   are playing
-    # 2. castle - this will be the castling routine where the user has to select a valid rook and other stuff like that
-    # 3. If its neither of these two the game will check if what you wrote follows the format for selecting a piece
-    #     (aka its typed correctly, the square that was chosen has to have a piece and the piece must be on your team )
-    #     Note: You could do this all in one condition but maybe for different steps you return different messages
-    #    and if it does then you go into the player_move routine where you have your selected piece
-    # 4. if neither of these work just run back up to the top of the loop
-    # Something else important to keep track of is that teams should switch
     loop do
+      # Check for any game things that ended the game
+      end_game
+
+      break if game_over
+
+      @message = "Watch out #{@current_team}, you are in check!" if @logic.in_check?(@current_team)
       display_game
+
       print "So, #{@current_team} what will you do?: "
       user_input = gets.chomp.downcase
+
       case user_input
 
       when 'end'
@@ -51,7 +53,23 @@ class GamePlay
       when 'c'
         castle_menu
       end
+    end
 
+    display_game
+  end
+
+  # Method will end the game only if someone wins or draws the game
+  def end_game
+    if @logic.check_mate?(@current_team)
+      switch_team
+      @message = "CHECK MATE. Congratulations to #{@current_team}, they have won the game!!!"
+      @game_over = true
+    elsif @logic.stale_mate?(@current_team)
+      @message = "It seems like #{@current_team} has been stalemated! This game is a draw!"
+      @game_over = true
+    elsif @logic.special_draw?
+      @message = 'Game Over! This game has resulted in a draw!'
+      @game_over = true
     end
   end
 
@@ -134,8 +152,9 @@ class GamePlay
       elsif @logic.valid_move?(piece_square, translate(move_coord))
         move_coord = translate(move_coord)
 
-        # For when a pawn is moved in such a way that it is left open for an en passant
-        open_to_en_passant = @logic.open_to_en_passant?(piece, move_coord)
+        # For when a pawn is moved in such a way that it is left open for an en passant {
+        piece.possible_en_passant = true if @logic.open_to_en_passant?(piece, move_coord)
+        # }
 
         # This is handling an en passant. In short terms, you move the pawn to the enemy pawn to capture it and then move
         # the pawn back to it's original square. After, you do the proper move after the if statement
@@ -146,14 +165,12 @@ class GamePlay
 
         formally_move(piece_square, move_coord)
 
-        # Promote the pawn if the pawn is moved into a promotion square {
+        # Promote the pawn if a pawn is moved into a promotion square {
         promotable_pawn = pawn_to_promote
         promotion_menu(promotable_pawn) unless promotable_pawn.nil?
         # }
 
         switch_team # Player has made a valid move, so it's no longer their turn
-
-        piece.add_en_passant_move if piece.is_a?(Pawn) && open_to_en_passant # For a future en passant attack
         break
       else
         @message = 'Sorry, but that is not a valid move'
@@ -211,6 +228,7 @@ class GamePlay
     @board.clear_all_highlighting
     coord = pawn.coordinates
     @board[coord].highlight_selected
+    in_play_set = @current_team == 'white' ? @board.white_in_play : @board.black_in_play
     @message = "Congratulations #{@current_team}, you can promote this pawn! \nTo what piece would you like to promote your pawn (q, r, b, kn)?: "
     promotion_pieces = {'q' => Queen, 'r' => Rook, 'b' => Bishop, 'kn' => Knight}
     loop do # User will not be able to leave this loop until they promote a pawn
@@ -218,8 +236,10 @@ class GamePlay
       user_input = gets.chomp.downcase
 
       if promotion_pieces.include?(user_input) # switch out the pieces
+        in_play_set.delete(@board[coord].piece) # Pawn should no longer be in play
         @board[coord].piece = nil # Remove the pawn
         @board.add_piece(coord, promotion_pieces[user_input], @current_team)
+        puts in_play_set
         @board[coord].piece.update_possible_moves
         @message = nil
         break
@@ -253,6 +273,7 @@ class GamePlay
     piece.moved = true if piece.is_a?(Pawn) || piece.is_a?(King) || piece.is_a?(Rook)
   end
 
+  # Returns a pawn that needs to be promoted
   def pawn_to_promote
     row = @current_team == 'white' ? 7 : 0 # The row we will check for the pawn promotion
     8.times do |i|

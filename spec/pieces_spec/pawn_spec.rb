@@ -204,21 +204,16 @@ describe Pawn do
     end
 
     it 'gives the correct attack move a black pawn and it gives no move to a white pawn ' do
-      @board[[3, 3]].piece.add_en_passant_move
+      @board[[3, 3]].piece.possible_en_passant = true
+      @board.update_all_pieces
       expect(@board[[4, 3]].piece.possible_moves).not_to include([3, 2])
       expect(@board[[2, 3]].piece.possible_moves).to include([3, 2])
     end
 
     it 'gives the correct attack move a white pawn' do
-      @board[[2, 3]].piece.add_en_passant_move
-      expect(@board[[3, 3]].piece.possible_moves).to include([2, 4])
-    end
-
-    it 'removes the en_passant attack after the pawns are updated again' do
-      @board[[3, 3]].piece.add_en_passant_move
+      @board[[2, 3]].piece.possible_en_passant = true
       @board.update_all_pieces
-      expect(@board[[2, 3]].piece.en_passant_attk).to eq(nil)
-      expect(@board[[2, 3]].piece.possible_moves).not_to include([3, 2])
+      expect(@board[[3, 3]].piece.possible_moves).to include([2, 4])
     end
   end
 end

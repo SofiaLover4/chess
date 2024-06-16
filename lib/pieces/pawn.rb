@@ -4,7 +4,7 @@ require_relative '../piece'
 
 # Pawn class for Chessboard
 class Pawn < Piece
-  attr_accessor :symbol, :capture_moves, :p_capture_moves, :en_passant_attk
+  attr_accessor :symbol, :capture_moves, :p_capture_moves, :en_passant_attk, :possible_en_passant
   attr_writer :moved
 
   def initialize(team, board, coordinates)
@@ -13,6 +13,7 @@ class Pawn < Piece
     @p_capture_moves = nil
     @en_passant_attk = nil
     @moved = false
+    @possible_en_passant = false
   end
 
   # Because a Pawn can only move twice if they haven't moved yet
@@ -23,7 +24,7 @@ class Pawn < Piece
   def update_possible_moves
     @possible_moves = Set.new
     @p_capture_moves = Set.new
-    @en_passant_attk = nil
+    add_en_passant_move
     if @team == 'white'
       @p_capture_moves = p_white_capture_moves
       @possible_moves.merge(white_moves).merge(white_capture_moves)
@@ -31,6 +32,7 @@ class Pawn < Piece
       @p_capture_moves = p_black_capture_moves
       @possible_moves.merge(black_moves).merge(black_capture_moves)
     end
+    @possible_moves.add(@en_passant_attk) unless @en_passant_attk.nil?
   end
 
   # # This method overwrites the possible_capture? method in the Piece class because pawns are a little different
@@ -118,16 +120,17 @@ class Pawn < Piece
   def add_en_passant_move
     x = @coordinates[0]
     y = @coordinates[1]
+    @en_passant_attk = nil
 
-    attack_square = @team == 'white' ? [x, y - 1] : [x, y + 1]
+    row_move = @team == 'white' ? 1 : -1 # Letting the method know which direction to move based on the team
+    left = [x - 1, y]
+    right = [x + 1, y]
 
-    if !out_of_bounds?([x - 1, y]) && @board[[x - 1, y]].piece? && @board[[x - 1, y]].piece.team != @team && @board[[x - 1, y]].piece.is_a?(Pawn)
-      @board[[x - 1, y]].piece.en_passant_attk = attack_square
-      @board[[x - 1, y]].piece.possible_moves.add(attack_square)
+    if !out_of_bounds?(left) && @board[left].piece? && @board[left].piece.team != @team && @board[left].piece.is_a?(Pawn) && @board[left].piece.possible_en_passant
+      @en_passant_attk = [x - 1, y + row_move] unless out_of_bounds?([x - 1, y + row_move])
     end
-    if !out_of_bounds?([x - 1, y]) && @board[[x + 1, y]].piece? && @board[[x + 1, y]].piece.team != @team && @board[[x + 1, y]].piece.is_a?(Pawn)
-      @board[[x + 1, y]].piece.en_passant_attk = attack_square
-      @board[[x + 1, y]].piece.possible_moves.add(attack_square)
+    if !out_of_bounds?(right) && @board[right].piece? && @board[right].piece.team != @team && @board[right].piece.is_a?(Pawn) && @board[right].piece.possible_en_passant
+      @en_passant_attk = [x + 1, y + row_move] unless out_of_bounds?([x - 1, y + row_move])
     end
 
   end
