@@ -176,6 +176,69 @@ class ChessBoard
     @board.each { |column| column.each {|square| square.clear } }
   end
 
+  def dump_json
+    white_in_play_names, white_in_play_data = to_name_and_data(@white_in_play)
+    black_in_play_names, black_in_play_data = to_name_and_data(@black_in_play)
+    white_out_names , white_out_data = to_name_and_data(@white_out)
+    black_out_names, black_out_data = to_name_and_data(@black_out)
+
+
+    {
+      'white_in_play_names' => white_in_play_names, 'white_in_play_data' => white_in_play_data,
+      'black_in_play_names' => black_in_play_names, 'black_in_play_data' => black_in_play_data,
+      'white_out_names' => white_out_names, 'white_out_data' => white_out_data,
+      'black_out_names' => black_out_names, 'black_out_data' => black_out_data
+    }.to_json
+  end
+
+  def self.load_json(json_string)
+    data = JSON.parse(json_string)
+    new_board = self.new
+    new_board.organize_names_and_data(data['white_in_play_names'], data['white_in_play_data'], 'white',  new_board, in_play: true)
+    new_board.organize_names_and_data(data['black_in_play_names'], data['black_in_play_data'], 'black', new_board, in_play: true)
+    new_board.organize_names_and_data(data['white_out_names'], data['white_out_data'], 'white', new_board, in_play: false)
+    new_board.organize_names_and_data(data['black_out_names'], data['black_out_data'], 'white', new_board, in_play: false)
+
+    new_board
+  end
+
+  # Helper method for #load_json
+  def organize_names_and_data(names, data, team, board, in_play: true)
+    pieces_set = if in_play
+                   team == 'white' ? @white_in_play : @black_in_play
+                 else
+                   team == 'white' ? @white_out : @black_out
+                 end
+
+
+    names.each_with_index do |name, i|
+      piece = nil
+
+      # Restoring the piece
+      case name
+      when 'Pawn'
+        piece = Pawn.load_json(data[i], board)
+      when 'Rook'
+        piece = Rook.load_json(data[i], board)
+      when 'Knight'
+        piece = Knight.load_json(data[i], board)
+      when 'Bishop'
+        piece = Bishop.load_json(data[i], board)
+      when 'Queen'
+        piece = Queen.load_json(data[i], board)
+      when 'King'
+        piece = King.load_json(data[i], board)
+        @white_king = piece if team == 'white'
+        @black_king = piece if team == 'black'
+      end
+
+
+      pieces_set.add(piece)
+      board[piece.coordinates].piece = piece if in_play
+
+    end
+
+  end
 
   private
 
@@ -200,6 +263,19 @@ class ChessBoard
     sorted_pieces.each { |piece| pieces_string += " #{piece.symbol} "}
 
     pieces_string
+  end
+
+  # For serializing the board
+  def to_name_and_data(pieces_set)
+    names = []
+    data = []
+
+    pieces_set.each do |piece|
+      names << piece.class.name
+      data << piece.dump_json
+    end
+
+    [names, data]
   end
 
 end
