@@ -3,17 +3,19 @@
 require_relative 'board'
 require_relative 'chess_logic'
 require 'json'
+require 'date'
 
 # Where the actual chessGame will be played and the menus
 class GamePlay
-  attr_accessor :current_team, :game_over, :message
+  attr_accessor :current_team, :game_over, :message, :file
 
-  def initialize(board: ChessBoard.new(play: true))
+  def initialize(board: ChessBoard.new(play: true), file: nil)
     @board = board
     @logic = ChessLogic.new(board: board) # Yeah this is some wierd annoying variable naming
     @current_team = 'white'
     @message = nil # For methods that want to give the user a message
     @game_over = false
+    @file = file
   end
 
   def switch_team
@@ -46,17 +48,48 @@ class GamePlay
       user_input = gets.chomp.downcase
 
       case user_input
-
+      when 'forfeit'
+        forfeit_game
+        break
       when 'end'
         break
       when 'm'
         select_piece_menu
       when 'c'
         castle_menu
+      when 's'
+        save_game
+        @message = 'Your game has been saved!'
       end
     end
 
+    save_menu
     display_game
+  end
+
+  def forfeit_game
+    @game_over = true
+    @message = "This game has concluded because #{@current_team} has forfeited!"
+  end
+
+  def save_game
+    File.open(@file, "w") { |f| f.write "#{Date.today}\n#{dump_json}" }
+  end
+
+  def save_menu
+    loop do
+      display_game
+      puts "\e[1mWould you like to save this game before you leave(y/n)?: "
+      user_input = gets.chomp.downcase
+
+      if user_input == 'y'
+        save_game
+        break
+      elsif user_input == 'n'
+        break
+      end
+
+    end
   end
 
   # Method will end the game only if someone wins or draws the game
@@ -253,7 +286,7 @@ class GamePlay
     {
       'board' => @board.dump_json,
       'current_team' => @current_team,
-      'message' => @message,
+      'message' => @message.nil? ? @message : @message.gsub(' ', '_'), # Serialization wasn't working with spaces so this was a work around
       'game_over' => @game_over
     }.to_json
   end
@@ -263,7 +296,7 @@ class GamePlay
 
     loaded_game = self.new(board: ChessBoard.load_json(data['board']))
     loaded_game.current_team = data['current_team']
-    loaded_game.message = data['message']
+    loaded_game.message = data['message'].nil? ? nil : data['message'].gsub('_', ' ')
     loaded_game.game_over = data['game_over']
 
     loaded_game
