@@ -2,6 +2,7 @@
 
 require_relative 'board'
 require_relative 'chess_logic'
+require 'json'
 
 # Where the actual chessGame will be played and the menus
 class GamePlay
@@ -246,6 +247,26 @@ class GamePlay
       end
       @message = "Sorry I didn\'t get that. The possible pieces you can promote to is a queen, rook, bishop, or knight. \nPlease type one of the following q, r, b, kn."
     end
+  end
+
+  def dump_json
+    {
+      'board' => @board.dump_json,
+      'current_team' => @current_team,
+      'message' => @message,
+      'game_over' => @game_over
+    }.to_json
+  end
+
+  def self.load_json(json_string)
+    data = JSON.parse(json_string)
+
+    loaded_game = self.new(board: ChessBoard.load_json(data['board']))
+    loaded_game.current_team = data['current_team']
+    loaded_game.message = data['message']
+    loaded_game.game_over = data['game_over']
+
+    loaded_game
   end
 
   private
