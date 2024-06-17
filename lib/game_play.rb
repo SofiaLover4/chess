@@ -9,6 +9,20 @@ require 'date'
 class GamePlay
   attr_accessor :current_team, :game_over, :message, :file
 
+  def valid_user_coord?(user_input)
+    # If the user is trying to select a space on the board, the string must be 2 long with the first character
+    # being a letter from a - h and the second character being an sting type integer from 1 - 8.
+    # Ord is converting the strings into integers and making sure they fit in their appropriate ranges
+    user_input.length == 2 && (97..104).include?(user_input[0].ord) && (49..56).include?(user_input[1].ord)
+  end
+
+  # Takes in user input and converts it too coordinates for the board
+  def translate(user_input)
+    chess_dict = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 }
+    8.times { |number| chess_dict[(number + 1).to_s] = number }
+
+    [chess_dict[user_input[0].to_sym], chess_dict[user_input[1]]] # Returning the translated coordinate
+  end
   def initialize(board: ChessBoard.new(play: true), file: nil)
     @board = board
     @logic = ChessLogic.new(board: board) # Yeah this is some wierd annoying variable naming
@@ -30,6 +44,7 @@ class GamePlay
   end
 
   def display_game
+    system('clear')
     @board.show_board
     puts @message unless @message.nil?
   end
@@ -44,7 +59,7 @@ class GamePlay
       @message = "Watch out #{@current_team}, you are in check!" if @logic.in_check?(@current_team)
       display_game
 
-      print "So, #{@current_team} what will you do?: "
+      print "So, #{@current_team} what will you do?(forfeit, end, m, c, s): "
       user_input = gets.chomp.downcase
 
       case user_input
@@ -71,43 +86,6 @@ class GamePlay
     @game_over = true
     @message = "This game has concluded because #{@current_team} has forfeited!"
   end
-
-  def save_game
-    File.open(@file, "w") { |f| f.write "#{Date.today}\n#{dump_json}" }
-  end
-
-  def save_menu
-    loop do
-      display_game
-      puts "\e[1mWould you like to save this game before you leave(y/n)?: "
-      user_input = gets.chomp.downcase
-
-      if user_input == 'y'
-        save_game
-        break
-      elsif user_input == 'n'
-        break
-      end
-
-    end
-  end
-
-  # Method will end the game only if someone wins or draws the game
-  def end_game
-    if @logic.check_mate?(@current_team)
-      switch_team
-      @message = "CHECK MATE. Congratulations to #{@current_team}, they have won the game!!!"
-      @game_over = true
-    elsif @logic.stale_mate?(@current_team)
-      @message = "It seems like #{@current_team} has been stalemated! This game is a draw!"
-      @game_over = true
-    elsif @logic.special_draw?
-      @message = 'Game Over! This game has resulted in a draw!'
-      @game_over = true
-    end
-  end
-
-  # Last two 'special' things to implement is castling and promotions
 
   def select_piece_menu
     original_team = @current_team
@@ -138,20 +116,6 @@ class GamePlay
     @board.clear_all_highlighting
   end
 
-  def valid_user_coord?(user_input)
-    # If the user is trying to select a space on the board, the string must be 2 long with the first character
-    # being a letter from a - h and the second character being an sting type integer from 1 - 8.
-    # Ord is converting the strings into integers and making sure they fit in their appropriate ranges
-    user_input.length == 2 && (97..104).include?(user_input[0].ord) && (49..56).include?(user_input[1].ord)
-  end
-
-  # Takes in user input and converts it too coordinates for the board
-  def translate(user_input)
-    chess_dict = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 }
-    8.times { |number| chess_dict[(number + 1).to_s] = number }
-
-    [chess_dict[user_input[0].to_sym], chess_dict[user_input[1]]] # Returning the translated coordinate
-  end
 
   # This method is for the user to select the piece they want to move
   def select_piece_square(user_input)
@@ -282,6 +246,37 @@ class GamePlay
     end
   end
 
+  def save_menu
+    loop do
+      display_game
+      puts "\e[1mWould you like to save this game before you leave(y/n)?: "
+      user_input = gets.chomp.downcase
+
+      if user_input == 'y'
+        save_game
+        break
+      elsif user_input == 'n'
+        break
+      end
+
+    end
+  end
+
+  # Method will end the game only if someone wins or draws the game
+  def end_game
+    if @logic.check_mate?(@current_team)
+      switch_team
+      @message = "CHECK MATE. Congratulations to #{@current_team}, they have won the game!!!"
+      @game_over = true
+    elsif @logic.stale_mate?(@current_team)
+      @message = "It seems like #{@current_team} has been stalemated! This game is a draw!"
+      @game_over = true
+    elsif @logic.special_draw?
+      @message = 'Game Over! This game has resulted in a draw!'
+      @game_over = true
+    end
+  end
+
   def dump_json
     {
       'board' => @board.dump_json,
@@ -336,5 +331,9 @@ class GamePlay
 
     end
     nil # else nothing is returned, meaning there's nothing to promote
+  end
+
+  def save_game
+    File.open(@file, "w") { |f| f.write "#{Date.today}\n#{dump_json}" }
   end
 end

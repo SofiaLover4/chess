@@ -55,7 +55,7 @@ class StartScreen
     loop do
       system('clear')
       display_saves
-      puts "\nPlease enter the number of the slot that you want to delete or enter 'back' if you want to select a file to play in: "
+      print "\nPlease enter the number of the slot that you want to reset or enter 'back' if you want to select a file to play in: "
       user_input = gets.chomp
 
       if user_input.length == 1  && user_input.ord >= 49 && user_input.ord <= 51

@@ -76,6 +76,7 @@ describe GamePlay do
       allow(@game_play).to receive(:display_game)
       allow(@game_play).to receive(:puts)
       allow(@game_play).to receive(:print)
+      allow_any_instance_of(GamePlay).to receive(:save_menu)
     end
 
     it 'ends the game when black puts white into a check mate' do
