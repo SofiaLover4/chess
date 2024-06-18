@@ -1,6 +1,10 @@
 # Chess
 
-![17229271-210A-4521-AF56-573D60A4D0AC_1_201_a](https://github.com/adrian-perez121/Chess/assets/107430887/4d47c7b9-09bd-4829-9cc6-0250017b93c6)
+
+
+https://github.com/adrian-perez121/Chess/assets/107430887/dd518456-b38b-41a5-8986-361355a4a9ce
+
+
 
 ## Background
 
