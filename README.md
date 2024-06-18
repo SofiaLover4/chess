@@ -4,6 +4,8 @@
 
 https://github.com/adrian-perez121/Chess/assets/107430887/dd518456-b38b-41a5-8986-361355a4a9ce
 
+*The Opera Game: A Chess game between Paul Morphy and Duke Karl*
+
 
 
 ## Background
