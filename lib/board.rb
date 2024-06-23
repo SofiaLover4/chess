@@ -197,7 +197,7 @@ class ChessBoard
     new_board.organize_names_and_data(data['white_in_play_names'], data['white_in_play_data'], 'white',  new_board, in_play: true)
     new_board.organize_names_and_data(data['black_in_play_names'], data['black_in_play_data'], 'black', new_board, in_play: true)
     new_board.organize_names_and_data(data['white_out_names'], data['white_out_data'], 'white', new_board, in_play: false)
-    new_board.organize_names_and_data(data['black_out_names'], data['black_out_data'], 'white', new_board, in_play: false)
+    new_board.organize_names_and_data(data['black_out_names'], data['black_out_data'], 'black', new_board, in_play: false)
 
     new_board
   end
